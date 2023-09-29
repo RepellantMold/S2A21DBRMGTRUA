@@ -10,3 +10,5 @@ A disassembly of Sonic the Hedgehog 2's August 21st prototype.
 	- originally trying to improve the disassembly before deleting the repo thinking nobody would even care about it
 - Clownacy
 	- mirroring RepellantMolds repo, making it bit perfect, clownmd5 (under 0BSD license)
+- PikaNoob
+        - started trying to improve the disassembly again because of boredom also hi
