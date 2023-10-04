@@ -12891,7 +12891,7 @@ Offset_0x00D430:
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para compilar os sprites de acordo com as defini��es dos Objects
+; Routine to convert mappings (etc) to proper Megadrive sprites
 ; ->>>
 ;===============================================================================
 Build_Sprites_Screen_Pos:                                      ; Offset_0x00D432
@@ -20919,7 +20919,7 @@ Chunk_Mem_Address:                                             ; Offset_0x013A30
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para localizar o ch�o
+; Routine to find the floor
 ; ->>>
 ;===============================================================================
 FindFloor:                                                     ; Offset_0x013C30
@@ -21050,12 +21050,12 @@ Offset_0x013D5C:
 		not.w   D1
 		rts
 ;===============================================================================
-; Rotina para localizar o ch�o
+; Routine to find the floor
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para o Object localizar o ch�o
+; Routine for Object to find floor
 ; ->>>
 ;===============================================================================
 Object_FindFloor:                                              ; Offset_0x013D6C
@@ -21122,12 +21122,12 @@ Offset_0x013DFC:
 		subi.w  #$0010, D1
 		rts
 ;===============================================================================
-; Rotina para o Object localizar o ch�o
+; Routine for Object to find floor
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para localizar a parede
+; Routine to find a wall
 ; ->>>
 ;===============================================================================
 FindWall:                                                      ; Offset_0x013E0A
@@ -21258,7 +21258,7 @@ Offset_0x013F36:
 		not.w   D1
 		rts
 ;===============================================================================
-; Rotina para localizar a parede
+; Routine to find a wall
 ; <<<-
 ;===============================================================================
 
@@ -21390,7 +21390,7 @@ Offset_0x014052:
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para calcular o quanto de espa�o h� acima do jogador
+; Routine to calculate how much space is above the player
 ; ->>>
 ;===============================================================================
 CalcRoomOverHead:                                              ; Offset_0x01405E
@@ -21410,7 +21410,7 @@ Offset_0x014076:
 		beq     Player_DontRunOnWalls                  ; Offset_0x014338
 		cmpi.b  #$C0, D0
 		beq     Player_DontRunOnWallsR                 ; Offset_0x014286
-Offset_0x0140A2: ; Referenciado pelos jogadores
+Offset_0x0140A2: ; Referenced by players
 		move.l  #Primary_Colision_Data_Buffer, (Current_Colision_Pointer).w ; $FFFFD000, $FFFFF796
 		cmpi.b  #$0C, Obj_Player_Top_Solid(A0)                   ; $003E
 		beq.s   Offset_0x0140BA
@@ -21459,7 +21459,7 @@ Offset_0x014128:
 Offset_0x014130:
 		rts
 ;===============================================================================
-; Rotina para calcular o quanto de espa�o h� acima do jogador
+; Routine to calculate how much space is above the player
 ; <<<-
 ;===============================================================================
 ; Offset_0x014132:
@@ -21480,7 +21480,7 @@ Offset_0x014152:
 Offset_0x01415E:
 		rts
 ;===============================================================================
-; Rotina para detectar se o jogador tocou o ch�o
+; Routine to detect if the player has touched the floor
 ; ->>>
 ;===============================================================================
 Player_HitFloor:                                               ; Offset_0x014160
@@ -21534,12 +21534,12 @@ Offset_0x0141DC:
 Offset_0x014202:
 		rts
 ;===============================================================================
-; Rotina para detectar se o jogador tocou o ch�o
+; Routine to detect if the player has touched the floor
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para detectar se o Object tocou o ch�o
+; Routine to detect if an Object has touched the floor
 ; ->>>
 ;===============================================================================
 ;ObjCheckFloorDist:
@@ -21562,12 +21562,12 @@ ObjHitFloor:                                                   ; Offset_0x014204
 Offset_0x014238:
 		rts
 ;===============================================================================
-; Rotina para detectar se o Object tocou o ch�o
+; Routine to detect if an Object has touched the floor
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para detectar se o Object bola de fogo tocou o ch�o
+; Routine to detect if the Fireball Object has touched the floor
 ; ->>>
 ;===============================================================================
 Fire_FindFloor:                                                ; Offset_0x01423A
@@ -21583,12 +21583,12 @@ Fire_FindFloor:                                                ; Offset_0x01423A
 		moveq   #$0C, D5
 		bra     FindFloor                              ; Offset_0x013C30
 ;===============================================================================
-; Rotina para detectar se o Object bola de fogo tocou o ch�o
+; Routine to detect if the Fireball Object has touched the floor
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para detectar se o Object anel tocou o ch�o
+; Routine to detect if the ring Object has touched the floor
 ; ->>>
 ;===============================================================================
 Ring_FindFloor:                                                ; Offset_0x014260
@@ -21604,7 +21604,7 @@ Ring_FindFloor:                                                ; Offset_0x014260
 		moveq   #$0C, D5
 		bra     Object_FindFloor                       ; Offset_0x013D6C
 ;===============================================================================
-; Rotina para detectar se o Object anel tocou o ch�o
+; Routine to detect if the ring Object has touched the floor
 ; <<<-
 ;===============================================================================
 Player_DontRunOnWallsR:                                        ; Offset_0x014286
@@ -21651,7 +21651,7 @@ Offset_0x0142EE:
 		move.b  #$C0, D2
 		bra     Offset_0x014152
 ;===============================================================================
-; Rotina para detectar se o Object tocou a parede a direita
+; Routine to detect if the Object has touched the wall on the right
 ; ->>>
 ;===============================================================================
 Object_HitWall_Right:                                          ; Offset_0x01430A
@@ -21670,7 +21670,7 @@ Object_HitWall_Right:                                          ; Offset_0x01430A
 Exit_Object_HitWall_Right:                                     ; Offset_0x014336
 		rts
 ;===============================================================================
-; Rotina para detectar se o Object tocou a parede a direita
+; Routine to detect if the Object has touched the wall on the right
 ; <<<-
 ;===============================================================================
 Player_DontRunOnWalls:                                         ; Offset_0x014338
@@ -21720,7 +21720,7 @@ Offset_0x0143A8:
 		move.b  #$80, D2
 		bra     Offset_0x014152
 ;===============================================================================
-; Rotina para detectar se o Object tocou o teto
+; Routine to detect if the Object has touched the ceiling
 ; ->>>
 ;===============================================================================
 Object_HitCeiling:                                             ; Offset_0x0143C8
@@ -21743,7 +21743,7 @@ Object_HitCeiling:                                             ; Offset_0x0143C8
 Offset_0x0143FE:
 		rts
 ;===============================================================================
-; Rotina para detectar se o Object tocou o teto
+; Routine to detect if the Object has touched the ceiling
 ; <<<-
 ;===============================================================================
 Player_DontRunOnWallsL:                                        ; Offset_0x014400
@@ -21780,7 +21780,7 @@ Player_DontRunOnWallsL:                                        ; Offset_0x014400
 		move.b  #$40, D2
 		bra     Offset_0x01411A
 ;===============================================================================
-; Rotina para detectar se o jogador tocou a parede
+; Routine to detect if the player has touched a wall
 ; ->>>
 ;===============================================================================
 Player_HitWall:                                                ; Offset_0x014468
@@ -21796,12 +21796,12 @@ Player_HitWall_D3:                                             ; Offset_0x014470
 		move.b  #$40, D2
 		bra     Offset_0x014152
 ;===============================================================================
-; Rotina para detectar se o jogador tocou a parede
+; Routine to detect if the player has touched a wall
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para detectar se o Object tocou a parede a esquerda
+; Routine to detect if the Object has touched the wall on the left
 ; ->>>
 ;===============================================================================
 Object_HitWall_Left:                                           ; Offset_0x014490
@@ -21820,15 +21820,15 @@ Object_HitWall_Left:                                           ; Offset_0x014490
 Exit_Object_HitWall_Left:                                      ; Offset_0x0144BC
 		rts
 ;===============================================================================
-; Rotina para detectar se o Object tocou a parede a esquerda
+; Routine to detect if the Object has touched the wall on the left
 ; <<<-
 ;===============================================================================
 		nop
 ;-------------------------------------------------------------------------------
 Obj_0x79_Lamp_Post:                                            ; Offset_0x0144C0
 ;===============================================================================
-; Object 0x79 - Poste de rein�cio, utilizado para salvar a posi��o do jogador
-; ->>>          na fase
+; Object 0x79 - Lamppost Checkpoint
+; ->>>          
 ;===============================================================================
 ; Offset_0x0144C0:
                 moveq   #$00, D0
@@ -21977,15 +21977,15 @@ Offset_0x0146F8:
 Lamp_Post_Mappings:                                            ; Offset_0x0146FA
                    include 'Map/obj79.asm'
 ;===============================================================================
-; Object 0x79 - Poste de rein�cio, utilizado para salvar a posi��o do jogador
-; <<<-          na fase
+; Object 0x79 - Lamppost Checkpoint
+; <<<-          
 ;==============================================================================='
 ;-------------------------------------------------------------------------------
 		nop
 ;-------------------------------------------------------------------------------
 Obj_0x7D_Hidden_Bonus:                                         ; Offset_0x014768
 ;===============================================================================
-; Object 0x7D - Bonus oculto no final das fases.
+; Object 0x7D - Hidden bonus points at the end of levels.
 ; ->>>          Leftover from Sonic 1, Not used.
 ;===============================================================================
 ; Offset_0x014768:
@@ -22045,9 +22045,9 @@ Offset_0x014810:
 ;-------------------------------------------------------------------------------
 Hidden_Bonus_Points:                                           ; Offset_0x014816
                 dc.w    $0000
-                dc.w    $03E8  ; 10000 pontos
-                dc.w    $0064  ; 1000  pontos
-                dc.w    $0001  ; 10    pontos ( deveria ser $000A  ; 100 pontos)
+                dc.w    $03E8  ; 10000 points
+                dc.w    $0064  ; 1000  points
+                dc.w    $0001  ; 10    points (It should be $000A  ; 100 points)
 ;-------------------------------------------------------------------------------
 Offset_0x01481E:
                 subq.w  #$01, Obj_Control_Var_04(A0)                     ; $0030
@@ -22064,7 +22064,7 @@ Offset_0x01483C:
 Hidden_Bonus_Mappings:                                         ; Offset_0x014842
                 include 'Map/obj7D.asm'
 ;===============================================================================
-; Object 0x7D - Bonus oculto no final das fases.
+; Object 0x7D - Hidden bonus points at the end of levels.
 ; <<<-          Leftover from Sonic 1, Not used.
 ;===============================================================================
 ;-------------------------------------------------------------------------------
@@ -22072,7 +22072,7 @@ Hidden_Bonus_Mappings:                                         ; Offset_0x014842
 ;-------------------------------------------------------------------------------
 Obj_0x44_Red_Ball_Bumper:                                      ; Offset_0x01486C
 ;===============================================================================
-; Object 0x44 - Mola circular com estrela na Casino Night
+; Object 0x44 - Round Bumpers in Casino Night
 ; ->>>
 ;===============================================================================
 ; Offset_0x01486C:
@@ -22167,12 +22167,12 @@ Offset_0x01498D:
 Red_Ball_Bumper_Mappings:                                      ; Offset_0x014994
                 include 'Map/obj44.asm'
 ;===============================================================================
-; Object 0x44 - Mola circular com estrela na Casino Night
+; Object 0x44 - Round Bumpers in Casino Night
 ; <<<-
 ;===============================================================================
 Obj_0x24_Oxygen_Bubbles:                                       ; Offset_0x0149CC
 ;===============================================================================
-; Object 0x24 - Bolhas de oxig�nio na Neo Green Hill
+; Object 0x24 - Oxygen Bubbles in Neo Green Hill
 ; ->>>
 ;===============================================================================
 ; Offset_0x0149CC:
@@ -22416,7 +22416,7 @@ Offset_0x014CF4:
 Offset_0x014CF8:
                 dc.b    $0F, $0E, $0F, $FF
 ;===============================================================================
-; Object 0x24 - Bolhas de oxig�nio na Neo Green Hill
+; Object 0x24 - Oxygen Bubbles in Neo Green Hill
 ; <<<-
 ;===============================================================================
 ;-------------------------------------------------------------------------------
@@ -22759,7 +22759,7 @@ Layer_Switch_Mappings:                                         ; Offset_0x0150E8
 ;===============================================================================
 Obj_0x0B_Open_Close_Platform:                                  ; Offset_0x0151C4
 ;===============================================================================
-; Object 0x0B - Plataforma tipo armadilha na Chemical Plant
+; Object 0x0B - Trap platform in Chemical Plant
 ; ->>>
 ;===============================================================================
 ; Offset_0x0151C4:
@@ -22843,7 +22843,7 @@ Offset_0x0152A6:
 Open_Close_Platform_Mappings:                                  ; Offset_0x0152AE
                 include 'Map/obj0B.asm'
 ;===============================================================================
-; Object 0x0B - Plataforma tipo armadilha na Chemical Plant
+; Object 0x0B - Trap platform in Chemical Plant
 ; <<<-
 ;===============================================================================
 ;-------------------------------------------------------------------------------
@@ -22951,7 +22951,7 @@ Jmp_00_To_CalcSine:                                            ; Offset_0x01541A
 ;-------------------------------------------------------------------------------
 Obj_0x12_HPz_Master_Emerald:                                   ; Offset_0x015420
 ;===============================================================================
-; Object 0x12 - Esmeralda Mestre na Hidden Palace
+; Object 0x12 - Hidden Palace Emerald
 ; ->>>
 ;===============================================================================
 ; Offset_0x015420:
@@ -22989,7 +22989,7 @@ Offset_0x01545A:
 Master_Emerald_Mappings:                                       ; Offset_0x015486
                         include 'Map/obj12.asm'
 ;===============================================================================
-; Object 0x12 - Esmeralda Mestre na Hidden Palace
+; Object 0x12 - Hidden Palace Emerald
 ; <<<-
 ;===============================================================================
 ;-------------------------------------------------------------------------------
@@ -23001,7 +23001,7 @@ Jmp_00_To_DeleteObject:                                        ; Offset_0x0154A2
 ;-------------------------------------------------------------------------------
 Obj_0x13_HPz_Waterfalls:                                       ; Offset_0x0154A8
 ;===============================================================================
-; Object 0x13 - Cachoeiras na Hidden Palace
+; Object 0x13 - Waterfalls in Hidden Palace
 ; ->>>
 ;===============================================================================
 ; Offset_0x0154A8:
@@ -23120,7 +23120,7 @@ Offset_0x01560C:
 HPz_Waterfalls_Mappings:                                       ; Offset_0x015624
                         include 'Map/obj13.asm'
 ;===============================================================================
-; Object 0x13 - Cachoeiras na Hidden Palace
+; Object 0x13 - Waterfalls in Hidden Palace
 ; <<<-
 ;===============================================================================
 ;-------------------------------------------------------------------------------
@@ -23131,7 +23131,7 @@ Jmp_01_To_DeleteObject:                                        ; Offset_0x0159C6
 ;-------------------------------------------------------------------------------
 Obj_0x04_Water_Surface:                                        ; Offset_0x0159CC
 ;===============================================================================
-; Object 0x04 - Superf�cie da �gua na Hidden Palace, Chemical Plant e
+; Object 0x04 - Water Surface in Hidden Palace, Chemical Plant and
 ; ->>>          Neo Green Hill
 ;===============================================================================
 ; Offset_0x0159CC:
@@ -23223,7 +23223,7 @@ Water_Surface_Mappings:                                        ; Offset_0x015AFE
 NGHz_Water_Surface_Mappings:                                   ; Offset_0x015BEE
                 include 'Map/obj04nghz.asm'
 ;===============================================================================
-; Object 0x04 - Superf�cie da �gua na Hidden Palace, Chemical Plant e
+; Object 0x04 - Water Surface in Hidden Palace, Chemical Plant and
 ; <<<-          Neo Green Hill
 ;===============================================================================
 Obj_0x49_Waterfall:                                            ; Offset_0x015C8E
@@ -23932,8 +23932,8 @@ Jmp_05_To_MarkObjGone_2:                                       ; Offset_0x01E476
 ;-------------------------------------------------------------------------------
 Obj_0x7A_Platform_Horizontal:                                  ; Offset_0x01E47C
 ;===============================================================================
-; Object 0x7A - Plataformas com movimentos horizontais na Chemical Plant,
-; ->>>          Dust Hill
+; Object 0x7A - Horizontal moving platforms in Chemical Plant and Dust Hill
+; ->>>          
 ;===============================================================================
 ; Offset_0x01E47C:
                 moveq   #$00, D0
@@ -24089,8 +24089,8 @@ Offset_0x01E642:
                 dc.l    $F8090010, $0008FFE8
                 dc.l    $F8090810, $08080000
 ;===============================================================================
-; Object 0x7A - Plataformas com movimentos horizontais na Chemical Plant,
-; <<<-          Dust Hill
+; Object 0x7A - Horizontal moving platforms in Chemical Plant and Dust Hill
+; <<<-          
 ;===============================================================================
 ;-------------------------------------------------------------------------------
 Jmp_0F_To_DisplaySprite:                                       ; Offset_0x01E654
@@ -24104,7 +24104,7 @@ Jmp_01_To_Platform_Object:                                     ; Offset_0x01E666
 ;-------------------------------------------------------------------------------
 Obj_0x7B_Spring_Tubes:                                         ; Offset_0x01E66C
 ;===============================================================================
-; Object 0x7B - Molas sobre os tubos na Chemical Plant
+; Object 0x7B - Springs on the tubes in Chemical Plant
 ; ->>>
 ;===============================================================================
 ; Offset_0x01E66C:
@@ -24260,7 +24260,7 @@ Offset_0x01E837:
 Spring_Tubes_Mappings:                                         ; Offset_0x01E840
                 include 'Map/obj7B.asm'
 ;===============================================================================
-; Object 0x7B - Molas sobre os tubos na Chemical Plant
+; Object 0x7B - Springs on the tubes in Chemical Plant
 ; <<<-
 ;===============================================================================
 ;-------------------------------------------------------------------------------
@@ -24279,8 +24279,8 @@ Jmp_03_To_SolidObject_2_A1:                                    ; Offset_0x01E89C
 ;-------------------------------------------------------------------------------
 Obj_0x7F_Vines_Switch:                                         ; Offset_0x01E8A4
 ;===============================================================================
-; Object 0x7F - Ra�zes usadas como interruptores para levantar as pontes na
-; ->>>          Dust Hill
+; Object 0x7F - Vines used as switches to lift bridges in Dust Hill
+; ->>>          
 ;===============================================================================
 ; Offset_0x01E8A4:
                 moveq   #$00, D0
@@ -24378,8 +24378,8 @@ Offset_0x01E9EA:
 Vines_Switch_Mappings:                                         ; Offset_0x01E9EC
                 include 'Map/obj7F.asm'
 ;===============================================================================
-; Object 0x7F - Ra�zes usadas como interruptores para levantar as pontes na
-; <<<-          Dust Hill
+; Object 0x7F - Vines used as switches to lift bridges in Dust Hill
+; <<<-          
 ;===============================================================================
 ;-------------------------------------------------------------------------------
 Jmp_15_To_MarkObjGone:                                         ; Offset_0x01EA24
@@ -24640,7 +24640,7 @@ Jmp_01_To_ObjectFall:                                          ; Offset_0x01FA10
 ;-------------------------------------------------------------------------------
 Obj_0x4C_Batbot:                                               ; Offset_0x01FA18
 ;===============================================================================
-; Object 0x4C - Batbot - Inimigo Morcego na Hidden Palace
+; Object 0x4C - Batbot - Bat enemy in Hidden Palace
 ; ->>>
 ;===============================================================================
 ; Offset_0x01FA18:
@@ -24859,7 +24859,7 @@ Offset_0x01FCAE:
 Batbot_Mappings:                                               ; Offset_0x01FCB6
                 include 'Map/obj4C.asm'
 ;===============================================================================
-; Object 0x4C - Batbot - Inimigo Morcego na Hidden Palace
+; Object 0x4C - Batbot - Bat enemy in Hidden Palace
 ; <<<-
 ;===============================================================================
 ;-------------------------------------------------------------------------------
@@ -25566,7 +25566,7 @@ Jmp_0E_To_AnimateSprite:                                       ; Offset_0x021DA4
 ;-------------------------------------------------------------------------------
 Obj_0x50_Aquis:                                                ; Offset_0x021DAC
 		include 'objects/obj_0x50.asm'
-Previus_Build_Obj_0x51_Aquis: ; Object 0z51 no Sonic 2 Beta    ; Offset_0x0223C8
+Previus_Build_Obj_0x51_Aquis: ; Object 0x51 in Sonic 2 Beta    ; Offset_0x0223C8
 		include 'objects/objpb_51.asm'
 ;-------------------------------------------------------------------------------
 Jmp_17_To_DisplaySprite:                                       ; Offset_0x02260C
