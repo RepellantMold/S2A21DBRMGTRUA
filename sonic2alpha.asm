@@ -4169,7 +4169,7 @@ Offset_0x00419A:
 ;===============================================================================
 
 ;===============================================================================
-; Modo de jogo ou demonstra��o das fases
+; Game mode or demonstration of the levels
 ; ->>>
 ;===============================================================================
 MusicList:                                                     ; Offset_0x0041B8
@@ -5603,7 +5603,7 @@ SS_Bg_Animate_Data_02:                                         ; Offset_0x00598F
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para carregar os limites das fases
+; Routine for loading level boundaries
 ; ->>>
 ;===============================================================================
 Level_Size_Load:                                               ; Offset_0x0059A4
@@ -5645,30 +5645,30 @@ Level_Size_Load:                                               ; Offset_0x0059A4
 		bra     Level_Load_Player_Position             ; Offset_0x005B3E
 ;-------------------------------------------------------------------------------
 Level_Size_Array:                                              ; Offset_0x005A2E
-		dc.l    $000029A0, $00000320, $00002940, $00000420  ; GHz
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; Wz
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720
-		dc.l    $00002280, $FF000800, $00001E80, $FF000800  ; Mz
-		dc.l    $00002A80, $FF000800, $00003FFF, $FF000800  ; Mz
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720
-		dc.l    $00002800, $00000720, $00003280, $00000720  ; HTz
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; HPz
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720
-		dc.l    $00002F80, $00000680, $00002580, $00000680  ; OOz
-		dc.l    $00002380, $03C00720, $00003FFF, $00600720  ; DHz
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; CNz
-		dc.l    $00002780, $00000720, $00002880, $00000720  ; CPz
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; GCz
-		dc.l    $000028C0, $020003A0, $000026C0, $018005A0  ; NGHz
-		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; DEz
+		dc.l    $000029A0, $00000320, $00002940, $00000420  ; GHZ
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; Zone 01
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; WZ
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; Zone 03
+		dc.l    $00002280, $FF000800, $00001E80, $FF000800  ; MTZ
+		dc.l    $00002A80, $FF000800, $00003FFF, $FF000800  ; MTZ Act 3
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; Zone 06
+		dc.l    $00002800, $00000720, $00003280, $00000720  ; HTZ
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; HPZ
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; Zone 09
+		dc.l    $00002F80, $00000680, $00002580, $00000680  ; OOZ
+		dc.l    $00002380, $03C00720, $00003FFF, $00600720  ; DHZ
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; CNZ
+		dc.l    $00002780, $00000720, $00002880, $00000720  ; CPZ
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; GCZ
+		dc.l    $000028C0, $020003A0, $000026C0, $018005A0  ; NGHZ
+		dc.l    $00003FFF, $00000720, $00003FFF, $00000720  ; DEZ
 ;===============================================================================
-; Rotina para carregar os limites das fases
+; Routine for loading level boundaries
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para carregar a posi��o do jogador na tela
+; Routine to load the player's position on the screen
 ; ->>>
 ;===============================================================================
 Level_Load_Player_Position:                                    ; Offset_0x005B3E
@@ -5747,12 +5747,12 @@ Player_Start_Position_Array:                                   ; Offset_0x005BAA
                 incbin  'Level/Death Egg Zone/startposact2.bin'      ; DEZ2
                 even
 ;===============================================================================
-; Rotina para carregar a posi��o do jogador na tela
+; Routine to load the player's position on the screen
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina de para controle de rolagem da tela
+; Routine for screen scroll control
 ; ->>>
 ;===============================================================================
 Background_Scroll_Speed:                                       ; Offset_0x005C32
@@ -5953,12 +5953,12 @@ Bg_Scroll_Speed_NGHz_Init:                                     ; Offset_0x005DEA
 Bg_Scroll_Speed_DEz:                                           ; Offset_0x005E02
 		rts
 ;===============================================================================
-; Rotina de para controle de rolagem da tela
+; Routine for screen scroll control
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para rolar a tela de acordo com a posi��o do personagem
+; Routine to scroll the screen according to the position of the character
 ; ->>>
 ;===============================================================================
 Background_Scroll_Layer:                                       ; Offset_0x005E04
@@ -7657,7 +7657,7 @@ Offset_0x006F00:
 		lea     (Camera_X_x8).w, A3                          ; $FFFFEE10
 		bra     Offset_0x007164
 ;===============================================================================
-; Rotina para rolar a tela de acordo com a posi��o do personagem
+; Routine to scroll the screen according to the position of the character
 ; <<<-
 ;===============================================================================
 
@@ -7955,7 +7955,7 @@ Offset_0x00723E:
 		lea     $00(A0, D0), A0
 		bra     Offset_0x007358
 ;-------------------------------------------------------------------------------
-; Rotina de controle da rolagem da fase Scrap Brain Zone 1
+; Scrap Brain Zone Deformation
 ; Leftover from Sonic 1
 ; <<<-
 ;-------------------------------------------------------------------------------
@@ -8887,7 +8887,7 @@ Offset_0x007AB6:
 		adda.w  #$0080, A2
 		rts
 ;===============================================================================
-; Rotina para defenir os limites da tela e carregar os chefes de fase
+; Routine to define the boundaries of the screen and load the level bosses
 ; ->>>
 ;===============================================================================
 Dyn_Screen_Boss_Loader:                                        ; Offset_0x007AD4
@@ -9735,7 +9735,7 @@ Offset_0x008464:
 DynResize_DEz:                                                 ; Offset_0x008466
 		rts
 ;===============================================================================
-; Rotina para defenir os limites da tela e carregar os chefes de fase
+; Routine to define the boundaries of the screen and load the level bosses
 ; <<<-
 ;===============================================================================
 
@@ -11538,7 +11538,7 @@ Offset_0x00AA86:
 		dc.l    $F805000E, $00070000
 ;-------------------------------------------------------------------------------
 Obj_0x25_Rings:                                                ; Offset_0x00AA98
-		;===============================================================================
+;===============================================================================
 ; Object 0x25 - An�is - Este Object n�o � usado pelos an�is normais nas fases
 ; ->>>
 ;===============================================================================
@@ -12746,7 +12746,7 @@ Offset_0x00D2FE:
 Offset_0x00D310:
 		bra     DeleteObject                           ; Offset_0x00D314
 ;===============================================================================
-; Rotinas para limpar a mem�ria alocada pelo Object
+; Routines for clearing the memory used by the Object
 ; ->>>
 ;===============================================================================
 DeleteObject:                                                  ; Offset_0x00D314
@@ -12759,12 +12759,12 @@ DeleteObject_FreeRam_Loop:                                     ; Offset_0x00D31A
 		dbra    D0, DeleteObject_FreeRam_Loop          ; Offset_0x00D31A
 		rts
 ;===============================================================================
-; Rotinas para limpar a mem�ria alocada pelo Object
+; Routines for clearing the memory used by the Object
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotinas para exibi��o do sprite
+; Routine for displaying a sprite
 ; ->>>
 ;===============================================================================
 DisplaySprite:                                                 ; Offset_0x00D322
@@ -12806,12 +12806,12 @@ DisplaySprite_Param:                                           ; Offset_0x00D35E
 Exit_DisplaySprite_Param:                                      ; Offset_0x00D370
 		rts
 ;===============================================================================
-; Rotinas para exibi��o do sprite
+; Routine for displaying a sprite
 ; <<<-
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para anima��o do sprite
+; Routine for animating a sprite
 ; ->>>
 ;===============================================================================
 AnimateSprite:                                                 ; Offset_0x00D372
@@ -12886,7 +12886,7 @@ Offset_0x00D428:
 Offset_0x00D430:
 		rts
 ;===============================================================================
-; Rotina para anima��o do sprite
+; Routine for animating a sprite
 ; <<<-
 ;===============================================================================
 
@@ -28602,7 +28602,7 @@ Jmp_00_To_NemesisDecToRAM:                                     ; Offset_0x02D0F8
 		jmp     (NemesisDecToRAM)                      ; Offset_0x001666
 		dc.w    $0000
 ;===============================================================================
-; Rotina para carregar o leiaute dos Est�gios Especiais - Leftover from Sonic 1
+; Routine to load the layout of the Special Stages - Leftover from Sonic 1
 ; <<<-
 ;===============================================================================
 Obj_0x21_Head_Up_Display:                                      ; Offset_0x02D100
@@ -28630,7 +28630,7 @@ Offset_0x02D2EC:
 Offset_0x02D314:
 		rts
 ;===============================================================================
-; Rotina para atualizar os contadores na tela (Pontos, Tempo, Vidas...).
+; Routine to update the counters on the screen (Points, Time, Lives...).
 ; ->>>
 ;===============================================================================
 HudUpdate:                                                     ; Offset_0x02D316
@@ -29068,7 +29068,7 @@ HUD_Art_Life_Numbers:                                          ; Offset_0x02DA3A
 HUD_Art_Debug_Numbers:                                         ; Offset_0x02DB7A
 		incbin  'art/uncompressed/hud_debg.dat'
 ;===============================================================================
-; Rotina para atualizar os contadores na tela (Pontos, Tempo, Vidas...).
+; Routine to update the counters on the screen (Points, Time, Lives...).
 ; <<<-
 ;===============================================================================
 		nop
@@ -29076,7 +29076,7 @@ Jmp_33_To_ModifySpriteAttr_2P:                                 ; Offset_0x02DE5C
 		jmp     (ModifySpriteAttr_2P)                  ; Offset_0x00DBBE
 		dc.w    $0000
 ;===============================================================================
-; Modo de depura��o
+; Debug Mode
 ; ->>>
 ;===============================================================================
 Debug_Mode:                                                    ; Offset_0x02DE64
@@ -29480,7 +29480,7 @@ Special_Stage_5:                                               ; Offset_0x03C2AC
 Special_Stage_6:                                               ; Offset_0x03C75C
 		incbin  'level/special stage/stage_6.eni'
 ;===============================================================================
-; Leiaute das fases
+; Level Layouts
 ; ->>>
 ;===============================================================================
 Level_Layout:                                                  ; Offset_0x03CA4E
@@ -29581,9 +29581,9 @@ Lvl1_Foreground_Map_Act_1:                                     ; Offset_0x03DAE4
 Lvl1_Background_Map_Act_1:                                     ; Offset_0x03DAE4
 Lvl1_Foreground_Map_Act_2:                                     ; Offset_0x03DAE4
 Lvl1_Background_Map_Act_2:                                     ; Offset_0x03DAE4
-		dc.b    $00      ; Tamanho X
-		dc.b    $00      ; Tamanho Y
-		dc.b    $00, $00 ; Dados
+		dc.b    $00      ; Size X
+		dc.b    $00      ; Size Y
+		dc.b    $00, $00 ; Data
 Wz_Foreground_Map_Act_1:                                       ; Offset_0x03DAE8
 		incbin  'level/wood zone/fg_map1.dat'
 Wz_Foreground_Map_Act_2:                                       ; Offset_0x03E2EA
@@ -29596,9 +29596,9 @@ Lvl3_Foreground_Map_Act_1:                                     ; Offset_0x03FAF0
 Lvl3_Background_Map_Act_1:                                     ; Offset_0x03FAF0
 Lvl3_Foreground_Map_Act_2:                                     ; Offset_0x03FAF0
 Lvl3_Background_Map_Act_2:                                     ; Offset_0x03FAF0
-		dc.b    $00      ; Tamanho X
-		dc.b    $00      ; Tamanho Y
-		dc.b    $00, $00 ; Dados
+		dc.b    $00      ; Size X
+		dc.b    $00      ; Size Y
+		dc.b    $00, $00 ; Data
 Mz_Foreground_Map_Act_1:                                       ; Offset_0x03FAF4
 		incbin  'level/metropolis zone/fg_map1.dat'
 Mz_Foreground_Map_Act_2:                                       ; Offset_0x0402F6
@@ -29615,9 +29615,9 @@ Lvl6_Foreground_Map_Act_1:                                     ; Offset_0x04135C
 Lvl6_Background_Map_Act_1:                                     ; Offset_0x04135C
 Lvl6_Foreground_Map_Act_2:                                     ; Offset_0x04135C
 Lvl6_Background_Map_Act_2:                                     ; Offset_0x04135C
-		dc.b    $00      ; Tamanho X
-		dc.b    $00      ; Tamanho Y
-		dc.b    $00, $00 ; Dados
+		dc.b    $00      ; Size X
+		dc.b    $00      ; Size Y
+		dc.b    $00, $00 ; Data
 HTz_Foreground_Map_Act_1:                                      ; Offset_0x041360
 		incbin  'level/hill top zone/fg_map1.dat'
 HTz_Foreground_Map_Act_2:                                      ; Offset_0x041B62
@@ -29636,9 +29636,9 @@ Lvl9_Foreground_Map_Act_1:                                     ; Offset_0x043BB4
 Lvl9_Background_Map_Act_1:                                     ; Offset_0x043BB4
 Lvl9_Foreground_Map_Act_2:                                     ; Offset_0x043BB4
 Lvl9_Background_Map_Act_2:                                     ; Offset_0x043BB4
-		dc.b    $00      ; Tamanho X
-		dc.b    $00      ; Tamanho Y
-		dc.b    $00, $00 ; Dados
+		dc.b    $00      ; Size X
+		dc.b    $00      ; Size Y
+		dc.b    $00, $00 ; Data
 OOz_Foreground_Map_Act_1:                                      ; Offset_0x043BB8
 		incbin  'level/oil ocean zone/fg_map1.dat'
 OOz_Foreground_Map_Act_2:                                      ; Offset_0x0443BA
@@ -29671,9 +29671,9 @@ GCz_Foreground_Map_Act_1:                                      ; Offset_0x047C2A
 GCz_Background_Map_Act_1:                                      ; Offset_0x047C2A
 GCz_Foreground_Map_Act_2:                                      ; Offset_0x047C2A
 GCz_Background_Map_Act_2:                                      ; Offset_0x047C2A
-		dc.b    $00      ; Tamanho X
-		dc.b    $00      ; Tamanho Y
-		dc.b    $00, $00 ; Dados
+		dc.b    $00      ; Size X
+		dc.b    $00      ; Size Y
+		dc.b    $00, $00 ; Data
 NGHz_Foreground_Map_Act_1:                                     ; Offset_0x047C2E
 		incbin  'level/neo green hill zone/fg_map1.dat'
 NGHz_Foreground_Map_Act_2:                                     ; Offset_0x048430
@@ -29686,14 +29686,14 @@ DEz_Foreground_Map_Act_1:                                      ; Offset_0x049C36
 DEz_Background_Map_Act_1:                                      ; Offset_0x049C36
 DEz_Foreground_Map_Act_2:                                      ; Offset_0x049C36
 DEz_Background_Map_Act_2:                                      ; Offset_0x049C36
-		dc.b    $00      ; Tamanho X
-		dc.b    $00      ; Tamanho Y
-		dc.b    $00, $00 ; Dados
+		dc.b    $00      ; Size X
+		dc.b    $00      ; Size Y
+		dc.b    $00, $00 ; Data
 ;===============================================================================
-; Leiaute das fases
+; Level Layouts
 ; <<<-
 ;===============================================================================
-; Anel gigante para acesso aos est�gios especiais.
+; Giant ring used to access the Special Stage.
 ; Not used, Leftover from Sonic 1.
 Art_Big_Ring:                                                  ; Offset_0x049C3A
 		incbin  'art/uncompressed/big_ring.dat'
@@ -29716,7 +29716,7 @@ Star_Light_Tiles_Overwrite:                                    ; Offset_0x04A87C
 ; <<<-
 ;-------------------------------------------------------------------------------
 ;===============================================================================
-; Leiaute dos Objects nas fases
+; Level Object Layouts
 ; ->>>
 ;===============================================================================
 Objects_Layout:                                                ; Offset_0x04C000
@@ -29811,24 +29811,24 @@ DEz_Obj_Act2:                                                  ; Offset_0x04ED20
 		dc.w    $FFFF, $0000, $0000
 		dc.w    $0000
 ;-------------------------------------------------------------------------------
-; Dados no formato kosinski sobrescritos.
-; Tiles 8x8 da fase Star Light do Sonic 1.
-; No disassembly do Sonic 1 (Revision 01) estes dados s�o os mesmos presentes no arquivo
+; Kosinski format data overwritten.
+; 8x8 tiles from the Star Light stage in Sonic 1.
+; In the Sonic 1 (Revision 01) disassembly, this data is the same as in the file
 ; "Sonic_1_Jap/Data/SLz/Chunks.kos" (0x054C � 0x1377)
 ; ->>>
 ;-------------------------------------------------------------------------------
 Star_Light_Chunks_Overwrite:                                   ; Offset_0x04ED28
 		incbin  'level/star light zone/chunks.dat'
 ;-------------------------------------------------------------------------------
-; Dados no formato kosinski sobrescritos.
-; Tiles 8x8 da fase Star Light do Sonic 1.
-; No disassembly do Sonic 1 (Revision 01) estes dados s�o os mesmos presentes no arquivo
+; Kosinski format data overwritten.
+; 8x8 tiles from the Star Light stage in Sonic 1.
+; In the Sonic 1 (Revision 01) disassembly, this data is the same as in the file
 ; "Sonic_1_Jap/Data/SLz/Chunks.kos" (0x054C � 0x1377)
 ; <<<-
 ;-------------------------------------------------------------------------------
 
 ;===============================================================================
-; Leiaute dos Objects nas fases
+; Level Object Layouts
 ; <<<-
 ;===============================================================================
 Art_Sonic:                                                     ; Offset_0x050000
