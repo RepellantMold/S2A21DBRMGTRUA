@@ -3,6 +3,7 @@ Cr              equ     $0D
 Lf              equ     $0A
 Tab             equ     $09    
                 dc.b    $3B, $20, $88, $B3, $8F, $6B, $91, $4F
+                ; Before compression $8000  After compression $2c00  Compression ratio 34.4%  Number of cells 1024
                 dc.b    ' $8000  ', $88, $B3, $8F, $6B, $8C, $E3
                 dc.b    ' $2c00  ', $88, $B3, $8F, $6B, $97, $A6
                 dc.b    ' 34.4%  ', $83, $5A, $83, $8B, $90, $94
