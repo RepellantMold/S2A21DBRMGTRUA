@@ -4074,7 +4074,7 @@ Level_Select_Text:                                             ; Offset_0x003DF4
 		dc.b    __,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__,_S,_T,_A,_G,_E,__,_1
 		dc.b    _S,_P,_E,_C,_I,_A,_L,__,_S,_T,_A,_G,_E,__,__,__,__,__,__,__,__,__,__,__,__,__,__
 		dc.b    _S,_O,_U,_N,_D,__,_S,_E,_L,_E,_C,_T,__,__,__,__,__,__,__,__,__,__,__,__,__,__,__
-		dc.b    $00 ; alinhamento
+		dc.b    $00 ; alignment
 ;-------------------------------------------------------------------------------
 ; Offset_0x0040CE:
 		lea     (M68K_RAM_Start), A1                         ; $FFFF0000
@@ -10757,7 +10757,7 @@ Log_Spikes_Mappings:                                           ; Offset_0x009186
 ;-------------------------------------------------------------------------------
 Obj_0x18_Platforms:                                            ; Offset_0x0091E0
 ;===============================================================================
-; Object 0x18 - Plataformas
+; Object 0x18 - Platforms
 ; ->>>
 ;===============================================================================
 ; Offset_0x0091E0:
@@ -11078,7 +11078,7 @@ GHz_HTz_Platforms_Mappings:                                    ; Offset_0x00952A
 NGHz_Platforms_Mappings:                                       ; Offset_0x009582
                 include 'Map/obj18nghz.asm'
 ;===============================================================================
-; Object 0x18 - Plataformas
+; Object 0x18 - Platforms
 ; <<<-
 ;===============================================================================
 ;-------------------------------------------------------------------------------
@@ -12383,7 +12383,233 @@ Offset_0x00C816:
 ; <<<-
 ;-------------------------------------------------------------------------------
 Obj_0x36_Spikes:                                               ; Offset_0x00C818
-		include 'objects/obj_0x36.asm'
+;===============================================================================
+; Object 0x36 - Spikes
+; ->>> 
+;===============================================================================   
+; Offset_0x00C818:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x00C826(PC, D0), D1
+                jmp     Offset_0x00C826(PC, D1) 
+;-------------------------------------------------------------------------------
+Offset_0x00C826:
+                dc.w    Offset_0x00C83E-Offset_0x00C826
+                dc.w    Offset_0x00C8AA-Offset_0x00C826
+                dc.w    Offset_0x00C8FA-Offset_0x00C826
+                dc.w    Offset_0x00C956-Offset_0x00C826         
+;-------------------------------------------------------------------------------    
+Spikes_Conf:                                                   ; Offset_0x00C82E
+                dc.b    $10, $10  ; Largura / Altura do espinho
+                dc.b    $20, $10
+                dc.b    $30, $10
+                dc.b    $40, $10
+                dc.b    $10, $10
+                dc.b    $10, $20
+                dc.b    $10, $30
+                dc.b    $10, $40       
+;------------------------------------------------------------------------------- 
+Offset_0x00C83E:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.l  #Spikes_Mappings, Obj_Map(A0)   ; Offset_0x00CA74, $0004
+                move.w  #$2434, Obj_Art_VRAM(A0)                         ; $0002
+                bsr     ModifySpriteAttr_2P                    ; Offset_0x00DBBE
+                ori.b   #$04, Obj_Flags(A0)                              ; $0001
+                move.b  #$04, Obj_Priority(A0)                           ; $0018
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                andi.b  #$0F, Obj_Subtype(A0)                            ; $0028
+                andi.w  #$00F0, D0
+                lea     Spikes_Conf(PC), A1                    ; Offset_0x00C82E
+                lsr.w   #$03, D0
+                adda.w  D0, A1
+                move.b  (A1)+, Obj_Width(A0)                             ; $0019
+                move.b  (A1)+, Obj_Height_2(A0)                          ; $0016
+                lsr.w   #$01, D0
+                move.b  D0, Obj_Map_Id(A0)                               ; $001A
+                cmpi.b  #$04, D0
+                bcs.s   Offset_0x00C88E
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+Offset_0x00C88E:
+                btst    #$01, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00C89C
+                move.b  #$06, Obj_Routine(A0)                            ; $0024
+Offset_0x00C89C:
+                move.w  Obj_X(A0), Obj_Control_Var_04(A0)         ; $0008, $0030
+                move.w  Obj_Y(A0), Obj_Control_Var_06(A0)         ; $000C, $0032
+                rts      
+;------------------------------------------------------------------------------- 
+Offset_0x00C8AA:
+                bsr     MoveSpikes
+                moveq   #$00, D1
+                move.b  Obj_Width(A0), D1                                ; $0019
+                addi.w  #$000B, D1
+                moveq   #$00, D2
+                move.b  Obj_Height_2(A0), D2                             ; $0016
+                move.w  D2, D3
+                addq.w  #$01, D3
+                move.w  Obj_X(A0), D4                                    ; $0008
+                bsr     SolidObject                            ; Offset_0x00F344
+                move.b  Obj_Status(A0), D6                               ; $0022
+                andi.b  #$18, D6
+                beq.s   Offset_0x00C8F2
+                move.b  D6, D0
+                andi.b  #$08, D0
+                beq.s   Offset_0x00C8E4
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                bsr     Touch_ChkHurt2                         ; Offset_0x00C9A4
+Offset_0x00C8E4:
+                andi.b  #$10, D6
+                beq.s   Offset_0x00C8F2
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                bsr     Touch_ChkHurt2                         ; Offset_0x00C9A4
+Offset_0x00C8F2:
+                move.w  Obj_Control_Var_04(A0), D0                       ; $0030
+                bra     MarkObjGone_2                          ; Offset_0x00D238   
+;------------------------------------------------------------------------------- 
+Offset_0x00C8FA:
+                move.w  Obj_X(A0), -(A7)                                 ; $0008
+                bsr     MoveSpikes
+                moveq   #$00, D1
+                move.b  Obj_Width(A0), D1                                ; $0019
+                addi.w  #$000B, D1
+                moveq   #$00, D2
+                move.b  Obj_Height_2(A0), D2                             ; $0016
+                move.w  D2, D3
+                addq.w  #$01, D3
+                move.w  (A7)+, D4
+                bsr     SolidObject                            ; Offset_0x00F344
+                swap.w  D6
+                andi.w  #$0003, D6
+                beq.s   Offset_0x00C94E
+                move.b  D6, D0
+                andi.b  #$01, D0
+                beq.s   Offset_0x00C93A
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                bsr     Touch_ChkHurt2                         ; Offset_0x00C9A4
+                bclr    #$05, Obj_Status(A0)                             ; $0022
+Offset_0x00C93A:
+                andi.b  #$02, D6
+                beq.s   Offset_0x00C94E
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                bsr     Touch_ChkHurt2                         ; Offset_0x00C9A4
+                bclr    #$06, Obj_Status(A0)                             ; $0022
+Offset_0x00C94E:
+                move.w  Obj_Control_Var_04(A0), D0                       ; $0030
+                bra     MarkObjGone_2                          ; Offset_0x00D238   
+;-------------------------------------------------------------------------------    
+Offset_0x00C956:
+                bsr     MoveSpikes
+                moveq   #$00, D1
+                move.b  Obj_Width(A0), D1                                ; $0019
+                addi.w  #$000B, D1
+                moveq   #$00, D2
+                move.b  Obj_Height_2(A0), D2                             ; $0016
+                move.w  D2, D3
+                addq.w  #$01, D3
+                move.w  Obj_X(A0), D4                                    ; $0008
+                bsr     SolidObject                            ; Offset_0x00F344
+                swap.w  D6
+                andi.w  #$000C, D6
+                beq.s   Offset_0x00C99C
+                move.b  D6, D0
+                andi.b  #$04, D0
+                beq.s   Offset_0x00C98E
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                bsr     Touch_ChkHurt2                         ; Offset_0x00C9A4
+Offset_0x00C98E:
+                andi.b  #$08, D6
+                beq.s   Offset_0x00C99C
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                bsr     Touch_ChkHurt2                         ; Offset_0x00C9A4
+Offset_0x00C99C:
+                move.w  Obj_Control_Var_04(A0), D0                       ; $0030
+                bra     MarkObjGone_2                          ; Offset_0x00D238   
+;-------------------------------------------------------------------------------  
+;Hurt_Player_A1:                                               ; Offset_0x00C9A4
+Touch_ChkHurt2:
+                tst.b   (Invincibility_Flag).w                       ; $FFFFFE2D
+                bne.s   Exit_Touch_ChkHurt2                    ; Offset_0x00C9D0
+                ; the "spike bug" was not fixed yet in this build
+                cmpi.b  #$04, Obj_Routine(A1)                            ; $0024
+                bcc.s   Exit_Touch_ChkHurt2                    ; Offset_0x00C9D0
+                move.l  Obj_Y(A1), D3                                    ; $000C
+                move.w  Obj_Speed_Y(A1), D0                              ; $0012
+                ext.l   D0
+                asl.l   #$08, D0
+                sub.l   D0, D3
+                move.l  D3, Obj_Y(A1)                                    ; $000C
+                move.l  A0, A2
+                move.l  A1, A0
+                jsr     (HurtCharacter)                        ; Offset_0x02B4DE
+                move.l  A2, A0
+Exit_Touch_ChkHurt2:                                           ; Offset_0x00C9D0
+                rts                                                             
+;-------------------------------------------------------------------------------  
+MoveSpikes:
+                moveq   #$00, D0
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                add.w   D0, D0
+                move.w  Offset_0x00C9E2(PC, D0), D1
+                jmp     Offset_0x00C9E2(PC, D1)                 
+;-------------------------------------------------------------------------------  
+Offset_0x00C9E2:
+                dc.w    Offset_0x00C9E8-Offset_0x00C9E2
+                dc.w    Offset_0x00C9EA-Offset_0x00C9E2
+                dc.w    Offset_0x00C9FE-Offset_0x00C9E2         
+;-------------------------------------------------------------------------------  
+Offset_0x00C9E8:
+                rts 
+;-------------------------------------------------------------------------------  
+Offset_0x00C9EA:
+                bsr     Offset_0x00CA12
+                moveq   #$00, D0
+                move.b  Obj_Control_Var_08(A0), D0                       ; $0034
+                add.w   Obj_Control_Var_06(A0), D0                       ; $0032
+                move.w  D0, Obj_Y(A0)                                    ; $000C
+                rts    
+;-------------------------------------------------------------------------------  
+Offset_0x00C9FE:
+                bsr     Offset_0x00CA12
+                moveq   #$00, D0
+                move.b  Obj_Control_Var_08(A0), D0                       ; $0034
+                add.w   Obj_Control_Var_04(A0), D0                       ; $0030
+                move.w  D0, Obj_X(A0)                                    ; $0008
+                rts
+Offset_0x00CA12:
+                tst.w   Obj_Control_Var_0C(A0)                           ; $0038
+                beq.s   Offset_0x00CA30
+                subq.w  #$01, Obj_Control_Var_0C(A0)                     ; $0038
+                bne.s   Offset_0x00CA72
+                tst.b   Obj_Flags(A0)                                    ; $0001
+                bpl.s   Offset_0x00CA72
+                move.w  #$00B6, D0
+                jsr     (Play_Sfx)                             ; Offset_0x001512
+                bra.s   Offset_0x00CA72
+Offset_0x00CA30:
+                tst.w   Obj_Control_Var_0A(A0)                           ; $0036
+                beq.s   Offset_0x00CA52
+                subi.w  #$0800, Obj_Control_Var_08(A0)                   ; $0034
+                bcc.s   Offset_0x00CA72
+                move.w  #$0000, Obj_Control_Var_08(A0)                   ; $0034
+                move.w  #$0000, Obj_Control_Var_0A(A0)                   ; $0036
+                move.w  #$003C, Obj_Control_Var_0C(A0)                   ; $0038
+                bra.s   Offset_0x00CA72
+Offset_0x00CA52:
+                addi.w  #$0800, Obj_Control_Var_08(A0)                   ; $0034
+                cmpi.w  #$2000, Obj_Control_Var_08(A0)                   ; $0034
+                bcs.s   Offset_0x00CA72
+                move.w  #$2000, Obj_Control_Var_08(A0)                   ; $0034
+                move.w  #$0001, Obj_Control_Var_0A(A0)                   ; $0036
+                move.w  #$003C, Obj_Control_Var_0C(A0)                   ; $0038
+Offset_0x00CA72:
+                rts        
+;-------------------------------------------------------------------------------
+Spikes_Mappings:                                               ; Offset_0x00CA74
+                include 'Map/obj36.asm'
+;===============================================================================
+; Object 0x36 - Spikes
+; <<<- 
+;===============================================================================		
 Obj_0x3B_Rock:                                                 ; Offset_0x00CBD4
 		include 'objects/obj_0x3B.asm'
 ;-------------------------------------------------------------------------------
@@ -12520,7 +12746,7 @@ Object_List:                                                   ; Offset_0x00CEF2
 		dc.l    Obj_0x56_GHz_Boss                      ; Offset_0x0200F8
 		dc.l    Obj_0x57_DHz_Boss                      ; Offset_0x026990
 		dc.l    Obj_0x58_GHz_Boss                      ; Offset_0x020372
-		dc.l    Obj_0x59_Motobug                       ; Offset_0x022638
+		dc.l    Obj_0x59_Snail                         ; Offset_0x022638
 		dc.l    Obj_0x5A                               ; Offset_0x021B18
 		dc.l    Obj_0x5B_GHz_Boss                      ; Offset_0x020786
 		dc.l    Obj_0x5C_Masher                        ; Offset_0x024294
@@ -14879,7 +15105,600 @@ Exit_Load_Object_List:                                         ; Offset_0x00E742
 ; <<<-
 ;-------------------------------------------------------------------------------
 Obj_0x41_Springs:                                              ; Offset_0x00E744
-		include 'objects/obj_0x41.asm'
+;===============================================================================
+; Object 0x41 - Yellow / Red Springs - Diagonal / Horizontal / Vertical
+; ->>>
+;===============================================================================    
+; Offset_0x00E744:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x00E774(PC, D0), D1
+                jsr     Offset_0x00E774(PC, D1)
+                tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
+                beq.s   Offset_0x00E75C
+                bra     DisplaySprite                          ; Offset_0x00D322
+Offset_0x00E75C:
+                move.w  Obj_X(A0), D0                                    ; $0008
+                andi.w  #$FF80, D0
+                sub.w   ($FFFFF7DA).w, D0
+                cmpi.w  #$0280, D0
+                bhi     DeleteObject                           ; Offset_0x00D314
+                bra     DisplaySprite                          ; Offset_0x00D322  
+;-------------------------------------------------------------------------------
+Offset_0x00E774:
+                dc.w    Offset_0x00E780-Offset_0x00E774
+                dc.w    Offset_0x00E858-Offset_0x00E774
+                dc.w    Offset_0x00E94A-Offset_0x00E774
+                dc.w    Offset_0x00EB5C-Offset_0x00E774
+                dc.w    Offset_0x00EC48-Offset_0x00E774
+                dc.w    Offset_0x00ED7E-Offset_0x00E774        
+;-------------------------------------------------------------------------------
+Offset_0x00E780:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.l  #Springs_Mappings, Obj_Map(A0)  ; Offset_0x00EEFC, $0004
+                move.w  #$045C, Obj_Art_VRAM(A0)                         ; $0002
+                ori.b   #$04, Obj_Flags(A0)                              ; $0001
+                move.b  #$10, Obj_Width(A0)                              ; $0019
+                move.b  #$04, Obj_Priority(A0)                           ; $0018
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                lsr.w   #$03, D0
+                andi.w  #$000E, D0
+                move.w  Offset_0x00E7B6(PC, D0), D0
+                jmp     Offset_0x00E7B6(PC, D0)      
+;-------------------------------------------------------------------------------
+Offset_0x00E7B6:
+                dc.w    Offset_0x00E82C-Offset_0x00E7B6
+                dc.w    Offset_0x00E7C0-Offset_0x00E7B6
+                dc.w    Offset_0x00E7E0-Offset_0x00E7B6
+                dc.w    Offset_0x00E7F4-Offset_0x00E7B6
+                dc.w    Offset_0x00E80E-Offset_0x00E7B6      
+;-------------------------------------------------------------------------------
+Offset_0x00E7C0:
+                move.b  #$04, Obj_Routine(A0)                            ; $0024
+                move.b  #$02, Obj_Ani_Number(A0)                         ; $001C
+                move.b  #$03, Obj_Map_Id(A0)                             ; $001A
+                move.w  #$0470, Obj_Art_VRAM(A0)                         ; $0002
+                move.b  #$08, Obj_Width(A0)                              ; $0019
+                bra.s   Offset_0x00E82C   
+;-------------------------------------------------------------------------------
+Offset_0x00E7E0:
+                move.b  #$06, Obj_Routine(A0)                            ; $0024
+                move.b  #$06, Obj_Map_Id(A0)                             ; $001A
+                bset    #$01, Obj_Status(A0)                             ; $0022
+                bra.s   Offset_0x00E82C      
+;-------------------------------------------------------------------------------
+Offset_0x00E7F4:
+                move.b  #$08, Obj_Routine(A0)                            ; $0024
+                move.b  #$04, Obj_Ani_Number(A0)                         ; $001C
+                move.b  #$07, Obj_Map_Id(A0)                             ; $001A
+                move.w  #$043C, Obj_Art_VRAM(A0)                         ; $0002
+                bra.s   Offset_0x00E82C  
+;-------------------------------------------------------------------------------
+Offset_0x00E80E:
+                move.b  #$0A, Obj_Routine(A0)                            ; $0024
+                move.b  #$04, Obj_Ani_Number(A0)                         ; $001C
+                move.b  #$0A, Obj_Map_Id(A0)                             ; $001A
+                move.w  #$043C, Obj_Art_VRAM(A0)                         ; $0002
+                bset    #$01, Obj_Status(A0)                             ; $0022
+;-------------------------------------------------------------------------------
+Offset_0x00E82C:
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                andi.w  #$0002, D0
+                move.w  Offset_0x00E854(PC, D0), Obj_Control_Var_04(A0)  ; $0030
+                btst    #$01, D0
+                beq.s   Offset_0x00E84E
+                bset    #$05, Obj_Art_VRAM(A0)                           ; $0002
+                move.l  #Springs_Mappings_01, Obj_Map(A0) ; Offset_0x00EF12, $0004
+Offset_0x00E84E:
+                bsr     ModifySpriteAttr_2P                    ; Offset_0x00DBBE
+                rts       
+;-------------------------------------------------------------------------------  
+Offset_0x00E854:
+                dc.w    $F000, $F600
+;-------------------------------------------------------------------------------
+Offset_0x00E858:
+                move.w  #$001B, D1
+                move.w  #$0008, D2
+                move.w  #$0010, D3
+                move.w  Obj_X(A0), D4                                    ; $0008
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                moveq   #$03, D6
+                movem.l D1-D4, -(A7)
+                bsr     SolidObject_2_A1                       ; Offset_0x00F3B4
+                btst    #$03, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00E880
+                bsr.s   Offset_0x00E8A4
+Offset_0x00E880:
+                movem.l (A7)+, D1-D4
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                moveq   #$04, D6
+                bsr     SolidObject_2_A1                       ; Offset_0x00F3B4
+                btst    #$04, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00E898
+                bsr.s   Offset_0x00E8A4
+Offset_0x00E898:
+                lea     (Springs_Animate_Data), A1             ; Offset_0x00EEC2
+                bra     AnimateSprite                          ; Offset_0x00D372 
+;-------------------------------------------------------------------------------
+; Offset_0x00E8A2:
+                rts 
+;-------------------------------------------------------------------------------
+Offset_0x00E8A4:
+                move.w  #$0100, Obj_Ani_Number(A0)                       ; $001C
+                addq.w  #$08, Obj_Y(A1)                                  ; $000C
+                move.w  Obj_Control_Var_04(A0), Obj_Speed_Y(A1)   ; $0012, $0030
+                bset    #$01, Obj_Status(A1)                             ; $0022
+                bclr    #$03, Obj_Status(A1)                             ; $0022
+                move.b  #$10, Obj_Ani_Number(A1)                         ; $001C
+                move.b  #$02, Obj_Routine(A1)                            ; $0024
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                bpl.s   Offset_0x00E8D8
+                move.w  #$0000, Obj_Speed(A1)                            ; $0010
+Offset_0x00E8D8:
+                btst    #$00, D0
+                beq.s   Offset_0x00E918
+                move.w  #$0001, Obj_Inertia(A1)                          ; $0014
+                move.b  #$01, Obj_Flip_Angle(A1)                         ; $0027
+                move.b  #$00, Obj_Ani_Number(A1)                         ; $001C
+                move.b  #$00, Obj_Control_Var_00(A1)                     ; $002C
+                move.b  #$04, Obj_Control_Var_01(A1)                     ; $002D
+                btst    #$01, D0
+                bne.s   Offset_0x00E908
+                move.b  #$01, Obj_Control_Var_00(A1)                     ; $002C
+Offset_0x00E908:
+                btst    #$00, Obj_Status(A1)                             ; $0022
+                beq.s   Offset_0x00E918
+                neg.b   Obj_Flip_Angle(A1)                               ; $0027
+                neg.w   Obj_Inertia(A1)                                  ; $0014
+Offset_0x00E918:
+                andi.b  #$0C, D0
+                cmpi.b  #$04, D0
+                bne.s   Offset_0x00E92E
+                move.b  #$0C, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0D, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00E92E:
+                cmpi.b  #$08, D0
+                bne.s   Offset_0x00E940
+                move.b  #$0E, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0F, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00E940:
+                move.w  #$00CC, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+;-------------------------------------------------------------------------------                
+Offset_0x00E94A:
+                move.w  #$0013, D1
+                move.w  #$000E, D2
+                move.w  #$000F, D3
+                move.w  Obj_X(A0), D4                                    ; $0008
+                lea     (Obj_Memory_Address).w, A1                   ; $FFFFB000
+                moveq   #$03, D6
+                movem.l D1-D4, -(A7)
+                bsr     SolidObject_2_A1                       ; Offset_0x00F3B4
+                btst    #$05, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00E98A
+                move.b  Obj_Status(A0), D1                               ; $0022
+                move.w  Obj_X(A0), D0                                    ; $0008
+                sub.w   Obj_X(A1), D0                                    ; $0008
+                bcs.s   Offset_0x00E982
+                eori.b  #$01, D1
+Offset_0x00E982:
+                andi.b  #$01, D1
+                bne.s   Offset_0x00E98A
+                bsr.s   Offset_0x00E9CA
+Offset_0x00E98A:
+                movem.l (A7)+, D1-D4
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                moveq   #$04, D6
+                bsr     SolidObject_2_A1                       ; Offset_0x00F3B4
+                btst    #$06, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00E9BA
+                move.b  Obj_Status(A0), D1                               ; $0022
+                move.w  Obj_X(A0), D0                                    ; $0008
+                sub.w   Obj_X(A1), D0                                    ; $0008
+                bcs.s   Offset_0x00E9B2
+                eori.b  #$01, D1
+Offset_0x00E9B2:
+                andi.b  #$01, D1
+                bne.s   Offset_0x00E9BA
+                bsr.s   Offset_0x00E9CA
+Offset_0x00E9BA:
+                bsr     Offset_0x00EAA2
+                lea     (Springs_Animate_Data), A1             ; Offset_0x00EEC2
+                bra     AnimateSprite                          ; Offset_0x00D372
+;-------------------------------------------------------------------------------
+; Offset_0x00E9C8:
+                rts   
+;-------------------------------------------------------------------------------
+Offset_0x00E9CA:
+                move.w  #$0300, Obj_Ani_Number(A0)                       ; $001C
+                move.w  Obj_Control_Var_04(A0), Obj_Speed(A1)     ; $0010, $0030
+                addq.w  #$08, Obj_X(A1)                                  ; $0008
+                bset    #$00, Obj_Status(A1)                             ; $0022
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                bne.s   Offset_0x00E9F8
+                bclr    #$00, Obj_Status(A1)                             ; $0022
+                subi.w  #$0010, Obj_X(A1)                                ; $0008
+                neg.w   Obj_Speed(A1)                                    ; $0010
+Offset_0x00E9F8:
+                move.w  #$000F, Obj_Control_Var_02(A1)                   ; $002E
+                move.w  Obj_Speed(A1), Obj_Inertia(A1)            ; $0010, $0014
+                btst    #$02, Obj_Status(A1)                             ; $0022
+                bne.s   Offset_0x00EA12
+                move.b  #$00, Obj_Ani_Number(A1)                         ; $001C
+Offset_0x00EA12:
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                bpl.s   Offset_0x00EA1E
+                move.w  #$0000, Obj_Speed_Y(A1)                          ; $0012
+Offset_0x00EA1E:
+                btst    #$00, D0
+                beq.s   Offset_0x00EA5E
+                move.w  #$0001, Obj_Inertia(A1)                          ; $0014
+                move.b  #$01, Obj_Flip_Angle(A1)                         ; $0027
+                move.b  #$00, Obj_Ani_Number(A1)                         ; $001C
+                move.b  #$01, Obj_Control_Var_00(A1)                     ; $002C
+                move.b  #$08, Obj_Control_Var_01(A1)                     ; $002D
+                btst    #$01, D0
+                bne.s   Offset_0x00EA4E
+                move.b  #$03, Obj_Control_Var_00(A1)                     ; $002C
+Offset_0x00EA4E:
+                btst    #$00, Obj_Status(A1)                             ; $0022
+                beq.s   Offset_0x00EA5E
+                neg.b   Obj_Flip_Angle(A1)                               ; $0027
+                neg.w   Obj_Inertia(A1)                                  ; $0014
+Offset_0x00EA5E:
+                andi.b  #$0C, D0
+                cmpi.b  #$04, D0
+                bne.s   Offset_0x00EA74
+                move.b  #$0C, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0D, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00EA74:
+                cmpi.b  #$08, D0
+                bne.s   Offset_0x00EA86
+                move.b  #$0E, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0F, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00EA86:
+                bclr    #$05, Obj_Status(A0)                             ; $0022
+                bclr    #$06, Obj_Status(A0)                             ; $0022
+                bclr    #$05, Obj_Status(A1)                             ; $0022
+                move.w  #$00CC, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+Offset_0x00EAA2:
+                cmpi.b  #$03, Obj_Ani_Number(A0)                         ; $001C
+                beq     Offset_0x00EB5A
+                move.w  Obj_X(A0), D0                                    ; $0008
+                move.w  D0, D1
+                addi.w  #$0028, D1
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00EAC4
+                move.w  D0, D1
+                subi.w  #$0028, D0
+Offset_0x00EAC4:
+                move.w  Obj_Y(A0), D2                                    ; $000C
+                move.w  D2, D3
+                subi.w  #$0018, D2
+                addi.w  #$0018, D3
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                btst    #$01, Obj_Status(A1)                             ; $0022
+                bne.s   Offset_0x00EB18
+                move.w  Obj_Inertia(A1), D4                              ; $0014
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00EAEC
+                neg.w   D4
+Offset_0x00EAEC:
+                tst.w   D4
+                bmi.s   Offset_0x00EB18
+                move.w  Obj_X(A1), D4                                    ; $0008
+                cmp.w   D0, D4
+                bcs     Offset_0x00EB18
+                cmp.w   D1, D4
+                bcc     Offset_0x00EB18
+                move.w  Obj_Y(A1), D4                                    ; $000C
+                cmp.w   D2, D4
+                bcs     Offset_0x00EB18
+                cmp.w   D3, D4
+                bcc     Offset_0x00EB18
+                move.w  D0, -(A7)
+                bsr     Offset_0x00E9CA
+                move.w  (A7)+, D0
+Offset_0x00EB18:
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                btst    #$01, Obj_Status(A1)                             ; $0022
+                bne.s   Offset_0x00EB5A
+                move.w  Obj_Inertia(A1), D4                              ; $0014
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00EB32
+                neg.w   D4
+Offset_0x00EB32:
+                tst.w   D4
+                bmi.s   Offset_0x00EB5A
+                move.w  Obj_X(A1), D4                                    ; $0008
+                cmp.w   D0, D4
+                bcs     Offset_0x00EB5A
+                cmp.w   D1, D4
+                bcc     Offset_0x00EB5A
+                move.w  Obj_Y(A1), D4                                    ; $000C
+                cmp.w   D2, D4
+                bcs     Offset_0x00EB5A
+                cmp.w   D3, D4
+                bcc     Offset_0x00EB5A
+                bsr     Offset_0x00E9CA
+Offset_0x00EB5A:
+                rts
+;-------------------------------------------------------------------------------                
+Offset_0x00EB5C:
+                move.w  #$001B, D1
+                move.w  #$0008, D2
+                move.w  #$0010, D3
+                move.w  Obj_X(A0), D4                                    ; $0008
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                moveq   #$03, D6
+                movem.l D1-D4, -(A7)
+                bsr     SolidObject_2_A1                       ; Offset_0x00F3B4
+                cmpi.w  #$FFFE, D4
+                bne.s   Offset_0x00EB82
+                bsr.s   Offset_0x00EBA4
+Offset_0x00EB82:
+                movem.l (A7)+, D1-D4
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                moveq   #$04, D6
+                bsr     SolidObject_2_A1                       ; Offset_0x00F3B4
+                cmpi.w  #$FFFE, D4
+                bne.s   Offset_0x00EB98
+                bsr.s   Offset_0x00EBA4
+Offset_0x00EB98:
+                lea     (Springs_Animate_Data), A1             ; Offset_0x00EEC2
+                bra     AnimateSprite                          ; Offset_0x00D372      
+;-------------------------------------------------------------------------------
+; Offset_0x00EBA2:
+                rts    
+;-------------------------------------------------------------------------------
+Offset_0x00EBA4:
+                move.w  #$0100, Obj_Ani_Number(A0)                       ; $001C
+                subq.w  #$08, Obj_Y(A1)                                  ; $000C
+                move.w  Obj_Control_Var_04(A0), Obj_Speed_Y(A1)   ; $0012, $0030
+                neg.w   Obj_Speed_Y(A1)                                  ; $0012
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                bpl.s   Offset_0x00EBC4
+                move.w  #$0000, Obj_Speed(A1)                            ; $0010
+Offset_0x00EBC4:
+                btst    #$00, D0
+                beq.s   Offset_0x00EC04
+                move.w  #$0001, Obj_Inertia(A1)                          ; $0014
+                move.b  #$01, Obj_Flip_Angle(A1)                         ; $0027
+                move.b  #$00, Obj_Ani_Number(A1)                         ; $001C
+                move.b  #$00, Obj_Control_Var_00(A1)                     ; $002C
+                move.b  #$04, Obj_Control_Var_01(A1)                     ; $002D
+                btst    #$01, D0
+                bne.s   Offset_0x00EBF4
+                move.b  #$01, Obj_Control_Var_00(A1)                     ; $002C
+Offset_0x00EBF4:
+                btst    #$00, Obj_Status(A1)                             ; $0022
+                beq.s   Offset_0x00EC04
+                neg.b   Obj_Flip_Angle(A1)                               ; $0027
+                neg.w   Obj_Inertia(A1)                                  ; $0014
+Offset_0x00EC04:
+                andi.b  #$0C, D0
+                cmpi.b  #$04, D0
+                bne.s   Offset_0x00EC1A
+                move.b  #$0C, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0D, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00EC1A:
+                cmpi.b  #$08, D0
+                bne.s   Offset_0x00EC2C
+                move.b  #$0E, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0F, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00EC2C:
+                bset    #$01, Obj_Status(A1)                             ; $0022
+                bclr    #$03, Obj_Status(A1)                             ; $0022
+                move.b  #$02, Obj_Routine(A1)                            ; $0024
+                move.w  #$00CC, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+;-------------------------------------------------------------------------------                
+Offset_0x00EC48:
+                move.w  #$001B, D1
+                move.w  #$0010, D2
+                move.w  Obj_X(A0), D4                                    ; $0008
+                lea     Offset_0x00EE8A(PC), A2
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                moveq   #$03, D6
+                movem.l D1-D4, -(A7)
+                bsr     SolidObject_3_A1                       ; Offset_0x00F406
+                btst    #$03, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00EC70
+                bsr.s   Offset_0x00EC94
+Offset_0x00EC70:
+                movem.l (A7)+, D1-D4
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                moveq   #$04, D6
+                bsr     SolidObject_3_A1                       ; Offset_0x00F406
+                btst    #$04, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x00EC88
+                bsr.s   Offset_0x00EC94
+Offset_0x00EC88:
+                lea     (Springs_Animate_Data), A1             ; Offset_0x00EEC2
+                bra     AnimateSprite                          ; Offset_0x00D372    
+;-------------------------------------------------------------------------------
+; Offset_0x00EC92:
+                rts                      
+;-------------------------------------------------------------------------------
+Offset_0x00EC94:
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                bne.s   Offset_0x00ECAA
+                move.w  Obj_X(A0), D0                                    ; $0008
+                subq.w  #$04, D0
+                cmp.w   Obj_X(A1), D0                                    ; $0008
+                bcs.s   Offset_0x00ECB8
+                rts
+Offset_0x00ECAA:
+                move.w  Obj_X(A0), D0                                    ; $0008
+                addq.w  #$04, D0
+                cmp.w   Obj_X(A1), D0                                    ; $0008
+                bcc.s   Offset_0x00ECB8
+                rts
+Offset_0x00ECB8:
+                move.w  #$0500, Obj_Ani_Number(A0)                       ; $001C
+                move.w  Obj_Control_Var_04(A0), Obj_Speed_Y(A1)   ; $0012, $0030
+                move.w  Obj_Control_Var_04(A0), Obj_Speed(A1)     ; $0010, $0030
+                addq.w  #$06, Obj_Y(A1)                                  ; $000C
+                addq.w  #$06, Obj_X(A1)                                  ; $0008
+                bset    #$00, Obj_Status(A1)                             ; $0022
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                bne.s   Offset_0x00ECF0
+                bclr    #$00, Obj_Status(A1)                             ; $0022
+                subi.w  #$000C, Obj_X(A1)                                ; $0008
+                neg.w   Obj_Speed(A1)                                    ; $0010
+Offset_0x00ECF0:
+                bset    #$01, Obj_Status(A1)                             ; $0022
+                bclr    #$03, Obj_Status(A1)                             ; $0022
+                move.b  #$10, Obj_Ani_Number(A1)                         ; $001C
+                move.b  #$02, Obj_Routine(A1)                            ; $0024
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                btst    #$00, D0
+                beq.s   Offset_0x00ED4C
+                move.w  #$0001, Obj_Inertia(A1)                          ; $0014
+                move.b  #$01, Obj_Flip_Angle(A1)                         ; $0027
+                move.b  #$00, Obj_Ani_Number(A1)                         ; $001C
+                move.b  #$01, Obj_Control_Var_00(A1)                     ; $002C
+                move.b  #$08, Obj_Control_Var_01(A1)                     ; $002D
+                btst    #$01, D0
+                bne.s   Offset_0x00ED3C
+                move.b  #$03, Obj_Control_Var_00(A1)                     ; $002C
+Offset_0x00ED3C:
+                btst    #$00, Obj_Status(A1)                             ; $0022
+                beq.s   Offset_0x00ED4C
+                neg.b   Obj_Flip_Angle(A1)                               ; $0027
+                neg.w   Obj_Inertia(A1)                                  ; $0014
+Offset_0x00ED4C:
+                andi.b  #$0C, D0
+                cmpi.b  #$04, D0
+                bne.s   Offset_0x00ED62
+                move.b  #$0C, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0D, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00ED62:
+                cmpi.b  #$08, D0
+                bne.s   Offset_0x00ED74
+                move.b  #$0E, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0F, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00ED74:
+                move.w  #$00CC, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+;-------------------------------------------------------------------------------
+Offset_0x00ED7E:
+                move.w  #$001B, D1
+                move.w  #$0010, D2
+                move.w  Obj_X(A0), D4                                    ; $0008
+                lea     Offset_0x00EEA6(PC), A2
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                moveq   #$03, D6
+                movem.l D1-D4, -(A7)
+                bsr     SolidObject_3_A1                       ; Offset_0x00F406
+                cmpi.w  #$FFFE, D4
+                bne.s   Offset_0x00EDA4
+                bsr.s   Offset_0x00EDC6
+Offset_0x00EDA4:
+                movem.l (A7)+, D1-D4
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                moveq   #$04, D6
+                bsr     SolidObject_3_A1                       ; Offset_0x00F406
+                cmpi.w  #$FFFE, D4
+                bne.s   Offset_0x00EDBA
+                bsr.s   Offset_0x00EDC6
+Offset_0x00EDBA:
+                lea     (Springs_Animate_Data), A1             ; Offset_0x00EEC2
+                bra     AnimateSprite                          ; Offset_0x00D372   
+;-------------------------------------------------------------------------------
+; Offset_0x00EDC4:
+                rts             
+;-------------------------------------------------------------------------------
+Offset_0x00EDC6:
+                move.w  #$0500, Obj_Ani_Number(A0)                       ; $001C
+                move.w  Obj_Control_Var_04(A0), Obj_Speed_Y(A1)   ; $0012, $0030
+                neg.w   Obj_Speed_Y(A1)                                  ; $0012
+                move.w  Obj_Control_Var_04(A0), Obj_Speed(A1)     ; $0010, $0030
+                subq.w  #$06, Obj_Y(A1)                                  ; $000C
+                addq.w  #$06, Obj_X(A1)                                  ; $0008
+                bset    #$00, Obj_Status(A1)                             ; $0022
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                bne.s   Offset_0x00EE02
+                bclr    #$00, Obj_Status(A1)                             ; $0022
+                subi.w  #$000C, Obj_X(A1)                                ; $0008
+                neg.w   Obj_Speed(A1)                                    ; $0010
+Offset_0x00EE02:
+                bset    #$01, Obj_Status(A1)                             ; $0022
+                bclr    #$03, Obj_Status(A1)                             ; $0022
+                move.b  #$02, Obj_Routine(A1)                            ; $0024
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                btst    #$00, D0
+                beq.s   Offset_0x00EE58
+                move.w  #$0001, Obj_Inertia(A1)                          ; $0014
+                move.b  #$01, Obj_Flip_Angle(A1)                         ; $0027
+                move.b  #$00, Obj_Ani_Number(A1)                         ; $001C
+                move.b  #$01, Obj_Control_Var_00(A1)                     ; $002C
+                move.b  #$08, Obj_Control_Var_01(A1)                     ; $002D
+                btst    #$01, D0
+                bne.s   Offset_0x00EE48
+                move.b  #$03, Obj_Control_Var_00(A1)                     ; $002C
+Offset_0x00EE48:
+                btst    #$00, Obj_Status(A1)                             ; $0022
+                beq.s   Offset_0x00EE58
+                neg.b   Obj_Flip_Angle(A1)                               ; $0027
+                neg.w   Obj_Inertia(A1)                                  ; $0014
+Offset_0x00EE58:
+                andi.b  #$0C, D0
+                cmpi.b  #$04, D0
+                bne.s   Offset_0x00EE6E
+                move.b  #$0C, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0D, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00EE6E:
+                cmpi.b  #$08, D0
+                bne.s   Offset_0x00EE80
+                move.b  #$0E, Obj_Control_Var_12(A1)                     ; $003E
+                move.b  #$0F, Obj_Control_Var_13(A1)                     ; $003F
+Offset_0x00EE80:
+                move.w  #$00CC, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512  
+;-------------------------------------------------------------------------------  
+Offset_0x00EE8A:
+                dc.b    $10, $10, $10, $10, $10, $10, $10, $10
+                dc.b    $10, $10, $10, $10, $0E, $0C, $0A, $08
+                dc.b    $06, $04, $02, $00, $FE, $FC, $FC, $FC
+                dc.b    $FC, $FC, $FC, $FC           
+;-------------------------------------------------------------------------------
+Offset_0x00EEA6:
+                dc.b    $F4, $F0, $F0, $F0, $F0, $F0, $F0, $F0
+                dc.b    $F0, $F0, $F0, $F0, $F2, $F4, $F6, $F8
+                dc.b    $FA, $FC, $FE, $00, $02, $04, $04, $04
+                dc.b    $04, $04, $04, $04                 
+;-------------------------------------------------------------------------------
+Springs_Animate_Data:                                          ; Offset_0x00EEC2
+                dc.w    Offset_0x00EECE-Springs_Animate_Data
+                dc.w    Offset_0x00EED1-Springs_Animate_Data
+                dc.w    Offset_0x00EEDD-Springs_Animate_Data
+                dc.w    Offset_0x00EEE0-Springs_Animate_Data
+                dc.w    Offset_0x00EEEC-Springs_Animate_Data
+                dc.w    Offset_0x00EEEF-Springs_Animate_Data
+Offset_0x00EECE:
+                dc.b    $0F, $00, $FF
+Offset_0x00EED1:
+                dc.b    $00, $01, $00, $00, $02, $02, $02, $02
+                dc.b    $02, $02, $FD, $00
+Offset_0x00EEDD:
+                dc.b    $0F, $03, $FF
+Offset_0x00EEE0:
+                dc.b    $00, $04, $03, $03, $05, $05, $05, $05
+                dc.b    $05, $05, $FD, $02
+Offset_0x00EEEC:
+                dc.b    $0F, $07, $FF
+Offset_0x00EEEF:
+                dc.b    $00, $08, $07, $07, $09, $09, $09, $09
+                dc.b    $09, $09, $FD, $04, $00                                   
+;-------------------------------------------------------------------------------
+Springs_Mappings:                                              ; Offset_0x00EEFC
+                include 'Map/obj41.asm'                                                           
+;===============================================================================
+; Object 0x41 - Yellow / Red Springs - Diagonal / Horizontal / Vertical
+; <<<-
+;===============================================================================		
 ;-------------------------------------------------------------------------------
 		nop
 ;-------------------------------------------------------------------------------
@@ -15452,7 +16271,7 @@ Offset_0x00F730:
 		bcs     Offset_0x00F678
 		move.l  A0, -(A7)
 		move.l  A1, A0
-		jsr     (Kill_Player)                          ; Offset_0x02B57C
+		jsr     (KillCharacter)                        ; Offset_0x02B57C
 		move.l  (A7)+, A0
 		move.w  D6, D4
 		addi.b  #$0F, D4
@@ -17652,7 +18471,7 @@ Offset_0x011126:
 ;===============================================================================
 ;-------------------------------------------------------------------------------
 Kill_Sonic:                                                    ; Offset_0x011128
-		jmp     (Kill_Player)                          ; Offset_0x02B57C
+		jmp     (KillCharacter)                        ; Offset_0x02B57C
 ;-------------------------------------------------------------------------------
 		dc.w    $0000
 ;-------------------------------------------------------------------------------
@@ -19422,7 +20241,7 @@ Obj05Ani_Hanging:
 ;===============================================================================
 ;-------------------------------------------------------------------------------
 Kill_Tails:                                                    ; Offset_0x012544
-		jmp     (Kill_Player)                          ; Offset_0x02B57C
+		jmp     (KillCharacter)                        ; Offset_0x02B57C
 ;-------------------------------------------------------------------------------
 		dc.w    $0000
 ;-------------------------------------------------------------------------------
@@ -23228,7 +24047,7 @@ NGHz_Water_Surface_Mappings:                                   ; Offset_0x015BEE
 ;===============================================================================
 Obj_0x49_Waterfall:                                            ; Offset_0x015C8E
 ;===============================================================================
-; Object 0x49 - Cachoeiras na Green Hill
+; Object 0x49 - Waterfalls in Green Hill
 ; ->>>
 ;===============================================================================
 ; Offset_0x015C8E:
@@ -23290,7 +24109,7 @@ Offset_0x015D38:
 Waterfall_Mappings:                                            ; Offset_0x015D40
                 include 'Map/obj49.asm'
 ;===============================================================================
-; Object 0x49 - Cachoeiras na Green Hill
+; Object 0x49 - Waterfalls in Green Hill
 ; <<<-
 ;===============================================================================
 Obj_0x31_Lava_Attributes:                                      ; Offset_0x015EDC
@@ -23318,7 +24137,7 @@ Offset_0x015EF2:
                 move.b  Offset_0x015EEE(PC, D0), Obj_Col_Flags(A0)       ; $0020
                 move.l  #Lava_Attributes_Mappings, Obj_Map(A0) ; Offset_0x015F4E, $0004
                 move.w  #$8680, Obj_Art_VRAM(A0)                         ; $0002
-                move.b  #$84, Obj_Flags(A0)                              ; $0001
+                move.b  #$84, Obj_Flags(A0)                              ; $0001 This causes the object to be visible if the player dies.
                 move.b  #$80, Obj_Width(A0)                              ; $0019
                 move.b  #$04, Obj_Priority(A0)                           ; $0018
                 move.b  Obj_Subtype(A0), Obj_Map_Id(A0)           ; $001A, $0028
@@ -23328,7 +24147,7 @@ Offset_0x015F28:
                 bne.s   Offset_0x015F42
                 move.w  Obj_X(A0), D0                                    ; $0008
                 andi.w  #$FF80, D0
-                sub.w   ($FFFFF7DA).w, D0
+                sub.w   (Camera_X_pos_coarse).w, D0
                 cmpi.w  #$0280, D0
                 bhi     Jmp_02_To_DeleteObject                 ; Offset_0x016396
 Offset_0x015F42:
@@ -23345,7 +24164,70 @@ Lava_Attributes_Mappings:                                      ; Offset_0x015F4E
 ; <<<-
 ;===============================================================================
 Obj_0x74_Invisible_Block:                                      ; Offset_0x015FBA
-		include 'objects/obj_0x74.asm'
+;===============================================================================
+; Object 0x74 - Invisible Block
+; ->>>
+;===============================================================================   
+; Offset_0x015FBA:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x015FC8(PC, D0), D1
+                jmp     Offset_0x015FC8(PC, D1)
+;-------------------------------------------------------------------------------
+Offset_0x015FC8:
+                dc.w    Offset_0x015FCC-Offset_0x015FC8
+                dc.w    Offset_0x016008-Offset_0x015FC8        
+;-------------------------------------------------------------------------------
+Offset_0x015FCC:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.l  #Invisible_Block_Mappings, Obj_Map(A0) ; Offset_0x016052, $0004
+                move.w  #$8680, Obj_Art_VRAM(A0)                         ; $0002
+                bsr     Jmp_00_To_ModifySpriteAttr_2P          ; Offset_0x01639C
+                ori.b   #$04, Obj_Flags(A0)                              ; $0001
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                move.b  D0, D1
+                andi.w  #$00F0, D0
+                addi.w  #$0010, D0
+                lsr.w   #$01, D0
+                move.b  D0, Obj_Width(A0)                                ; $0019
+                andi.w  #$000F, D1
+                addq.w  #$01, D1
+                lsl.w   #$03, D1
+                move.b  D1, Obj_Height_2(A0)                             ; $0016    
+;-------------------------------------------------------------------------------
+Offset_0x016008:
+                bsr     Jmp_00_To_Check_Object_On_Screen       ; Offset_0x0163A2
+                bne.s   Offset_0x01602A
+                moveq   #$00, D1
+                move.b  Obj_Width(A0), D1                                ; $0019
+                addi.w  #$000B, D1
+                moveq   #$00, D2
+                move.b  Obj_Height_2(A0), D2                             ; $0016
+                move.w  D2, D3
+                addq.w  #$01, D3
+                move.w  Obj_X(A0), D4                                    ; $0008
+                bsr     SolidObject_2                          ; Offset_0x00F39E
+Offset_0x01602A:
+                tst.w   (Two_Player_Flag).w                          ; $FFFFFFD8
+                bne.s   Offset_0x016044
+                move.w  Obj_X(A0), D0                                    ; $0008
+                andi.w  #$FF80, D0
+                sub.w   ($FFFFF7DA).w, D0
+                cmpi.w  #$0280, D0
+                bhi     Jmp_02_To_DeleteObject                 ; Offset_0x016396
+Offset_0x016044:
+                tst.w   (Debug_Mode_Flag_Index).w                    ; $FFFFFE08
+                beq.s   Offset_0x016050
+                jmp     (DisplaySprite)                        ; Offset_0x00D322
+Offset_0x016050:
+                rts                 
+;-------------------------------------------------------------------------------
+Invisible_Block_Mappings:                                      ; Offset_0x016052
+                include 'Map/obj74.asm'
+;===============================================================================
+; Object 0x74 - Invisible Block
+; <<<-
+;===============================================================================		
 Obj_0x7C_Metal_Structure:                                      ; Offset_0x0160BE
 		include 'objects/obj_0x7C.asm'
 Obj_0x27_Object_Hit:                                           ; Offset_0x016174
@@ -23540,11 +24422,89 @@ Jmp_07_To_ModifySpriteAttr_2P:                                 ; Offset_0x018E4A
 		jmp     (ModifySpriteAttr_2P)                  ; Offset_0x00DBBE
 ;-------------------------------------------------------------------------------
 Obj_0x07_0il_Attributes:                                       ; Offset_0x018E50
-		include 'objects/obj_0x07.asm'
+;===============================================================================
+; Object 0x07 - Oil in Oil Ocean
+; ->>> 
+;===============================================================================
+; Offset_0x018E50:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x018E5E(PC, D0), D1
+                jmp     Offset_0x018E5E(PC, D1)
+;-------------------------------------------------------------------------------    
+Offset_0x018E5E:
+                dc.w    Offset_0x018E62-Offset_0x018E5E
+                dc.w    Offset_0x018E84-Offset_0x018E5E         
+;-------------------------------------------------------------------------------
+Offset_0x018E62:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.w  #$0758, Obj_Y(A0)                                ; $000C
+                move.b  #$20, Obj_Width(A0)                              ; $0019
+                move.w  Obj_Y(A0), Obj_Control_Var_04(A0)         ; $000C, $0030
+                move.b  #$30, Obj_Control_Var_0C(A0)                     ; $0038
+                bset    #$07, Obj_Status(A0)                             ; $0022  
+;-------------------------------------------------------------------------------
+Offset_0x018E84:
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                moveq   #$08, D1
+                move.b  Obj_Status(A0), D0                               ; $0022
+                and.b   D1, D0
+                bne.s   Offset_0x018EA0
+                cmpi.b  #$30, Obj_Control_Var_0C(A0)                     ; $0038
+                beq.s   Offset_0x018EAA
+                addq.b  #$01, Obj_Control_Var_0C(A0)                     ; $0038
+                bra.s   Offset_0x018EAA
+Offset_0x018EA0:
+                tst.b   Obj_Control_Var_0C(A0)                           ; $0038
+                beq.s   Offset_0x018EFE
+                subq.b  #$01, Obj_Control_Var_0C(A0)                     ; $0038
+Offset_0x018EAA:
+                moveq   #$20, D1
+                moveq   #$00, D3
+                move.b  Obj_Control_Var_0C(A0), D3                       ; $0038
+                moveq   #$03, D6
+                move.w  Obj_X(A1), D4                                    ; $0008
+                move.w  D4, Obj_X(A0)                                    ; $0008
+                bsr     Jmp_00_To_Platform_Object_A1           ; Offset_0x018F1A
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                moveq   #$10, D1
+                move.b  Obj_Status(A0), D0                               ; $0022
+                and.b   D1, D0
+                bne.s   Offset_0x018EDC
+                cmpi.b  #$30, Obj_Control_Var_0E(A0)                     ; $003A
+                beq.s   Offset_0x018EE6
+                addq.b  #$01, Obj_Control_Var_0E(A0)                     ; $003A
+                bra.s   Offset_0x018EE6
+Offset_0x018EDC:
+                tst.b   Obj_Control_Var_0E(A0)                           ; $003A
+                beq.s   Offset_0x018EFE
+                subq.b  #$01, Obj_Control_Var_0E(A0)                     ; $003A
+Offset_0x018EE6:
+                moveq   #$20, D1
+                moveq   #$00, D3
+                move.b  Obj_Control_Var_0E(A0), D3                       ; $003A
+                moveq   #$04, D6
+                move.w  Obj_X(A1), D4                                    ; $0008
+                move.w  D4, Obj_X(A0)                                    ; $0008
+                bsr     Jmp_00_To_Platform_Object_A1           ; Offset_0x018F1A
+                rts
+Offset_0x018EFE:
+                not.b   D1
+                and.b   D1, Obj_Status(A0)                               ; $0022
+                move.l  A0, -(A7)
+                move.l  A0, A2
+                move.l  A1, A0
+                bsr     Oil_KillCharacter                      ; Offset_0x018F14
+                move.l  (A7)+, A0
+                rts     
+;===============================================================================
+; Object 0x07 - Oil in Oil Ocean
+; <<<- 
+;===============================================================================		
 ;-------------------------------------------------------------------------------
 		nop
-Oil_Kill_Player:                                               ; Offset_0x018F14
-		jmp     (Kill_Player)                          ; Offset_0x02B57C
+Oil_KillCharacter:                                             ; Offset_0x018F14
+		jmp     (KillCharacter)                        ; Offset_0x02B57C
 Jmp_00_To_Platform_Object_A1:                                  ; Offset_0x018F1A
 		jmp     (Platform_Object_A1)                   ; Offset_0x00F842
 ;-------------------------------------------------------------------------------
@@ -23895,11 +24855,132 @@ Jmp_0F_To_SolidObject:                                         ; Offset_0x01DECC
 		dc.w    $0000
 ;-------------------------------------------------------------------------------
 Obj_0x76_Platform_Spikes:                                      ; Offset_0x01DED4
-		include 'objects/obj_0x76.asm'
+;===============================================================================
+; Object 0x76 - Platform with spikes on the sides in Dust Hill
+; ->>> 
+;===============================================================================   
+; Offset_0x01DED4:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x01DEE2(PC, D0), D1
+                jmp     Offset_0x01DEE2(PC, D1)
+;-------------------------------------------------------------------------------
+Offset_0x01DEE2:
+                dc.w    Offset_0x01DEEA-Offset_0x01DEE2
+                dc.w    Offset_0x01DF3A-Offset_0x01DEE2      
+;-------------------------------------------------------------------------------
+Platform_Spikes_Config:                                        ; Offset_0x01DEE6
+                dc.b    $40, $10            ; Width / Height of spike
+                dc.b    $00, $00                                        
+;-------------------------------------------------------------------------------
+Offset_0x01DEEA:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.l  #Platform_Spikes_Mappings, Obj_Map(A0) ; Offset_0x01E016, $0004
+                move.w  #$0000, Obj_Art_VRAM(A0)                         ; $0002
+                bsr     Jmp_1C_To_ModifySpriteAttr_2P          ; Offset_0x01E052
+                ori.b   #$04, Obj_Flags(A0)                              ; $0001
+                move.b  #$04, Obj_Priority(A0)                           ; $0018
+                moveq   #$00, D0
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                lsr.w   #$02, D0
+                andi.w  #$001C, D0
+                lea     Platform_Spikes_Config(PC, D0), A2     ; Offset_0x01DEE6
+                move.b  (A2)+, Obj_Width(A0)                             ; $0019
+                move.b  (A2)+, Obj_Height_2(A0)                          ; $0016
+                move.b  (A2)+, Obj_Map_Id(A0)                            ; $001A
+                move.w  Obj_X(A0), Obj_Control_Var_08(A0)         ; $0008, $0034
+                move.w  Obj_Y(A0), Obj_Control_Var_04(A0)         ; $000C, $0030
+                andi.w  #$000F, Obj_Subtype(A0)                          ; $0028  
+;-------------------------------------------------------------------------------
+Offset_0x01DF3A:
+                move.w  Obj_X(A0), -(A7)                                 ; $0008
+                moveq   #$00, D0
+                move.b  Obj_Subtype(A0), D0                              ; $0028
+                move.w  Offset_0x01DFA6(PC, D0), D1
+                jsr     Offset_0x01DFA6(PC, D1)
+                move.w  (A7)+, D4
+                tst.b   Obj_Flags(A0)                                    ; $0001
+                bpl.s   Offset_0x01DF9E
+                moveq   #$00, D1
+                move.b  Obj_Width(A0), D1                                ; $0019
+                addi.w  #$000B, D1
+                moveq   #$00, D2
+                move.b  Obj_Height_2(A0), D2                             ; $0016
+                move.w  D2, D3
+                addq.w  #$01, D3
+                bsr     Jmp_10_To_SolidObject                  ; Offset_0x01E058
+                swap.w  D6
+                andi.w  #$0003, D6
+                beq.s   Offset_0x01DF9E
+                move.b  D6, D0
+                andi.b  #$01, D0
+                beq.s   Offset_0x01DF8A
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                bsr     Jmp_00_To_Touch_ChkHurt2               ; Offset_0x01E04C
+                bclr    #$05, Obj_Status(A0)                             ; $0022
+Offset_0x01DF8A:
+                andi.b  #$02, D6
+                beq.s   Offset_0x01DF9E
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+                bsr     Jmp_00_To_Touch_ChkHurt2               ; Offset_0x01E04C
+                bclr    #$06, Obj_Status(A0)                             ; $0022
+Offset_0x01DF9E:
+                move.w  Obj_Control_Var_08(A0), D0                       ; $0034
+                bra     Jmp_04_To_MarkObjGone_2                ; Offset_0x01E05E                                         
+;-------------------------------------------------------------------------------
+Offset_0x01DFA6:
+                dc.w    Offset_0x01DFAA-Offset_0x01DFA6
+                dc.w    Offset_0x01DFFA-Offset_0x01DFA6                  
+;-------------------------------------------------------------------------------
+Offset_0x01DFAA:
+                lea     (Player_One).w, A1                           ; $FFFFB000
+                bsr.s   Offset_0x01DFB4
+                lea     (Player_Two).w, A1                           ; $FFFFB040
+Offset_0x01DFB4:
+                btst    #$01, Obj_Status(A1)                             ; $0022
+                bne.s   Offset_0x01DFF8
+                move.w  Obj_X(A1), D0                                    ; $0008
+                sub.w   Obj_X(A0), D0                                    ; $0008
+                addi.w  #$00C0, D0
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x01DFD4
+                subi.w  #$0100, D0
+Offset_0x01DFD4:
+                cmpi.w  #$0080, D0
+                bcc.s   Offset_0x01DFF8
+                move.w  Obj_Y(A1), D0                                    ; $000C
+                sub.w   Obj_Y(A0), D0                                    ; $000C
+                addi.w  #$0010, D0
+                cmpi.w  #$0020, D0
+                bcc.s   Offset_0x01DFF8
+                move.b  #$02, Obj_Subtype(A0)                            ; $0028
+                move.w  #$0080, Obj_Control_Var_0A(A0)                   ; $0036
+Offset_0x01DFF8:
+                rts  
+;-------------------------------------------------------------------------------
+Offset_0x01DFFA:
+                tst.w   Obj_Control_Var_0A(A0)                           ; $0036
+                beq.s   Offset_0x01E014
+                subq.w  #$01, Obj_Control_Var_0A(A0)                     ; $0036
+                moveq   #-$01, D0
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x01E010
+                neg.w   D0
+Offset_0x01E010:
+                add.w   D0, Obj_X(A0)                                    ; $0008
+Offset_0x01E014:
+                rts        
+;-------------------------------------------------------------------------------   
+Platform_Spikes_Mappings:                                      ; Offset_0x01E016
+                include 'Map/obj76.asm'
+;===============================================================================
+; Object 0x76 - Platform with spikes on the sides in Dust Hill
+; <<<- 
+;===============================================================================		
 ;-------------------------------------------------------------------------------
 		nop
-Jmp_00_To_Hurt_Player_A1:                                      ; Offset_0x01E04C
-		jmp     (Hurt_Player_A1)                       ; Offset_0x00C9A4
+Jmp_00_To_Touch_ChkHurt2:                                      ; Offset_0x01E04C
+		jmp     (Touch_ChkHurt2)                       ; Offset_0x00C9A4
 Jmp_1C_To_ModifySpriteAttr_2P:                                 ; Offset_0x01E052
 		jmp     (ModifySpriteAttr_2P)                  ; Offset_0x00DBBE
 Jmp_10_To_SolidObject:                                         ; Offset_0x01E058
@@ -24389,8 +25470,8 @@ Jmp_20_To_ModifySpriteAttr_2P:                                 ; Offset_0x01EA2A
 ;-------------------------------------------------------------------------------
 Obj_0x80_Vines_Chain_Hook:                                     ; Offset_0x01EA30
 ;===============================================================================
-; Object 0x80 - Corrente com gancho na Sky Fortress.
-; ->>>          Ra�zes que pode se pendurar na Dust Hill.
+; Object 0x80 - Chain with hook in the Sky Fortress.
+; ->>>          Roots that can hang from Dust Hill.
 ;===============================================================================
 ; Offset_0x01EA30:
                 moveq   #$00, D0
@@ -24539,8 +25620,8 @@ Offset_0x01EC12:
 Vines_Mappings:                                                ; Offset_0x01EC14
                 include 'Map/obj80.asm'
 ;===============================================================================
-; Object 0x80 - Corrente com gancho na Sky Fortress.
-; <<<-          Ra�zes que pode se pendurar na Dust Hill.
+; Object 0x80 - Chain with hook in the Sky Fortress.
+; ->>>          Roots that can hang from Dust Hill.
 ;===============================================================================
 ;-------------------------------------------------------------------------------
 Jmp_16_To_MarkObjGone:                                         ; Offset_0x01ED80
@@ -25585,8 +26666,184 @@ Jmp_13_To_SpeedToPos:                                          ; Offset_0x022630
 		jmp     (SpeedToPos)                           ; Offset_0x00D1DA
 		dc.w    $0000
 ;-------------------------------------------------------------------------------
-Obj_0x59_Motobug:                                              ; Offset_0x022638
-		include 'objects/obj_0x59.asm'
+Obj_0x59_Snail:                                                ; Offset_0x022638
+;===============================================================================
+; Object 0x59 - Snail Badnik in Green Hill (Unused)
+; ->>>
+;===============================================================================   
+; Offset_0x022638:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x022646(PC, D0), D1
+                jmp     Offset_0x022646(PC, D1)
+;-------------------------------------------------------------------------------
+Offset_0x022646:
+                dc.w    Offset_0x022650-Offset_0x022646
+                dc.w    Offset_0x0226F0-Offset_0x022646
+                dc.w    Offset_0x02281C-Offset_0x022646
+                dc.w    Offset_0x022854-Offset_0x022646
+                dc.w    Offset_0x0227DA-Offset_0x022646         
+;-------------------------------------------------------------------------------
+Offset_0x022650:
+                move.l  #Snail_Mappings, Obj_Map(A0)    ; Offset_0x022888, $0004
+                move.w  #$0402, Obj_Art_VRAM(A0)                         ; $0002
+                bsr     Jmp_2A_To_ModifySpriteAttr_2P          ; Offset_0x0228DA
+                ori.b   #$04, Obj_Flags(A0)                              ; $0001
+                move.b  #$0A, Obj_Col_Flags(A0)                          ; $0020
+                move.b  #$04, Obj_Priority(A0)                           ; $0018
+                move.b  #$10, Obj_Width(A0)                              ; $0019
+                move.b  #$10, Obj_Height_2(A0)                           ; $0016
+                move.b  #$0E, Obj_Width_2(A0)                            ; $0017
+                bsr     Jmp_12_To_SingleObjectLoad_2           ; Offset_0x0228C2
+                bne.s   Offset_0x0226D8
+                move.b  #$59, Obj_Id(A1)                                 ; $0000
+                move.b  #$06, Obj_Routine(A1)                            ; $0024
+                move.l  #Snail_Mappings, Obj_Map(A1)  ;   Offset_0x022888, $0004
+                move.w  #$2402, Obj_Art_VRAM(A1)                         ; $0002
+                bsr     Jmp_05_To_ModifySpriteAttr_2P_A1       ; Offset_0x0228CE
+                move.b  #$03, Obj_Priority(A1)                           ; $0018
+                move.b  #$10, Obj_Width(A1)                              ; $0019
+                move.b  Obj_Status(A0), Obj_Status(A1)            ; $0022, $0022
+                move.b  Obj_Flags(A0), Obj_Flags(A1)              ; $0001, $0001
+                move.l  A0, Obj_Timer(A1)                                ; $002A
+                move.w  Obj_X(A0), Obj_X(A1)                      ; $0008, $0008
+                move.w  Obj_Y(A0), Obj_Y(A1)                      ; $000C, $000C
+                move.b  #$02, Obj_Map_Id(A1)                             ; $001A
+Offset_0x0226D8:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.w  #$FF80, D0
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x0226EA
+                neg.w   D0
+Offset_0x0226EA:
+                move.w  D0, Obj_Speed(A0)                                ; $0010
+                rts     
+;-------------------------------------------------------------------------------
+Offset_0x0226F0:
+                bsr     Offset_0x022738
+                bsr     Jmp_14_To_SpeedToPos                   ; Offset_0x0228E6
+                jsr     (ObjHitFloor)                          ; Offset_0x014204
+                cmpi.w  #$FFF8, D1
+                blt.s   Offset_0x02271C
+                cmpi.w  #$000C, D1
+                bge.s   Offset_0x02271C
+                add.w   D1, Obj_Y(A0)                                    ; $000C
+                lea     (Snail_Animate_Data), A1               ; Offset_0x02287C
+                bsr     Jmp_10_To_AnimateSprite                ; Offset_0x0228C8
+                bra     Jmp_00_To_MarkObjGone_4                ; Offset_0x0228D4
+Offset_0x02271C:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.w  #$0014, Obj_Control_Var_04(A0)                   ; $0030
+                st      Obj_Control_Var_08(A0)                           ; $0034
+                lea     (Snail_Animate_Data), A1               ; Offset_0x02287C
+                bsr     Jmp_10_To_AnimateSprite                ; Offset_0x0228C8
+                bra     Jmp_00_To_MarkObjGone_4                ; Offset_0x0228D4
+Offset_0x022738:
+                tst.b   Obj_Control_Var_09(A0)                           ; $0035
+                bne.s   Offset_0x02277A
+                move.w  (Player_One_Position_X).w, D0                ; $FFFFB008
+                sub.w   Obj_X(A0), D0                                    ; $0008
+                cmpi.w  #$0064, D0
+                bgt.s   Offset_0x02277A
+                cmpi.w  #$FF9C, D0
+                blt.s   Offset_0x02277A
+                tst.w   D0
+                bmi.s   Offset_0x022760
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x02277A
+                bra.s   Offset_0x022768
+Offset_0x022760:
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                bne.s   Offset_0x02277A
+Offset_0x022768:
+                move.w  Obj_Speed(A0), D0                                ; $0010
+                asl.w   #$02, D0
+                move.w  D0, Obj_Speed(A0)                                ; $0010
+                st      Obj_Control_Var_09(A0)                           ; $0035
+                bsr     Offset_0x02277C
+Offset_0x02277A:
+                rts
+Offset_0x02277C:
+                bsr     Jmp_12_To_SingleObjectLoad_2           ; Offset_0x0228C2
+                bne.s   Offset_0x0227D8
+                move.b  #$59, Obj_Id(A1)                                 ; $0000
+                move.b  #$08, Obj_Routine(A1)                            ; $0024
+                move.l  #Buzzer_Mappings, Obj_Map(A1)   ; Offset_0x0241EA, $0004
+                move.w  #$3E6, Obj_Art_VRAM(A1)                          ; $0002
+                ; VRAM value leftover from the Simon Wai build, it has been
+                ; moved to #$3D2 in this build.
+                bsr     Jmp_05_To_ModifySpriteAttr_2P_A1       ; Offset_0x0228CE
+                move.b  #$04, Obj_Priority(A1)                           ; $0018
+                move.b  #$10, Obj_Width(A1)                              ; $0019
+                move.b  Obj_Status(A0), Obj_Status(A1)            ; $0022, $0022
+                move.b  Obj_Flags(A0), Obj_Flags(A1)              ; $0001, $0001
+                move.l  A0, Obj_Timer(A1)                                ; $002A
+                move.w  Obj_X(A0), Obj_X(A1)                      ; $0008, $0008
+                move.w  Obj_Y(A0), Obj_Y(A1)                      ; $000C, $000C
+                addq.w  #$07, Obj_Y(A1)                                  ; $000C
+                addi.w  #$000D, Obj_X(A1)                                ; $0008
+                move.b  #$01, Obj_Ani_Number(A1)                         ; $001C
+Offset_0x0227D8:
+                rts
+;-------------------------------------------------------------------------------
+Offset_0x0227DA:
+                move.l  Obj_Timer(A0), A1                                ; $002A
+                cmpi.b  #$59, (A1)
+                bne     Jmp_1B_To_DeleteObject                 ; Offset_0x0228BC
+                tst.b   Obj_Control_Var_08(A1)                           ; $0034
+                bne     Jmp_1B_To_DeleteObject                 ; Offset_0x0228BC
+                move.w  Obj_X(A1), Obj_X(A0)                      ; $0008, $0008
+                move.w  Obj_Y(A1), Obj_Y(A0)                      ; $000C, $000C
+                addq.w  #$07, Obj_Y(A0)                                  ; $000C
+                moveq   #$0D, D0
+                btst    #$00, Obj_Status(A0)                             ; $0022
+                beq.s   Offset_0x02280A
+                neg.w   D0
+Offset_0x02280A:
+                add.w   D0, Obj_X(A0)                                    ; $0008
+                lea     (Buzzer_AnimateData), A1               ; Offset_0x0241CE
+                bsr     Jmp_10_To_AnimateSprite                ; Offset_0x0228C8
+                bra     Jmp_00_To_MarkObjGone_4                ; Offset_0x0228D4       
+;-------------------------------------------------------------------------------
+Offset_0x02281C:
+                subi.w  #$0001, Obj_Control_Var_04(A0)                   ; $0030
+                bpl     Jmp_00_To_MarkObjGone_4                ; Offset_0x0228D4
+                neg.w   Obj_Speed(A0)                                    ; $0010
+                bsr     Jmp_08_To_ObjectFall                   ; Offset_0x0228E0
+                move.w  Obj_Speed(A0), D0                                ; $0010
+                asr.w   #$02, D0
+                move.w  D0, Obj_Speed(A0)                                ; $0010
+                bchg    #00, Obj_Status(A0)                              ; $0022
+                bchg    #00, Obj_Flags(A0)                               ; $0001
+                subq.b  #$02, Obj_Routine(A0)                            ; $0024
+                sf      Obj_Control_Var_08(A0)                           ; $0034
+                sf      Obj_Control_Var_09(A0)                           ; $0035
+                bra     Jmp_00_To_MarkObjGone_4                ; Offset_0x0228D4   
+;-------------------------------------------------------------------------------
+Offset_0x022854:
+                move.l  Obj_Timer(A0), A1                                ; $002A
+                cmpi.b  #$59, (A1)
+                bne     Jmp_1B_To_DeleteObject                 ; Offset_0x0228BC
+                move.w  Obj_X(A1), Obj_X(A0)                      ; $0008, $0008
+                move.w  Obj_Y(A1), Obj_Y(A0)                      ; $000C, $000C
+                move.b  Obj_Status(A1), Obj_Status(A0)            ; $0022, $0022
+                move.b  Obj_Flags(A1), Obj_Flags(A0)              ; $0001, $0001
+                bra     Jmp_00_To_MarkObjGone_4                ; Offset_0x0228D4              
+;-------------------------------------------------------------------------------
+Snail_Animate_Data:                                            ; Offset_0x02287C
+                dc.w    Offset_0x022880-Snail_Animate_Data
+                dc.w    Offset_0x022884-Snail_Animate_Data
+Offset_0x022880:
+                dc.b    $05, $00, $01, $FF
+Offset_0x022884:
+                dc.b    $01, $00, $01, $FF      
+;-------------------------------------------------------------------------------
+Snail_Mappings:
+                include 'Map/obj59.asm'
+;===============================================================================
+; Object 0x59 - Snail Badnik in Green Hill (Unused)
+; ->>>
+;===============================================================================		
 ;-------------------------------------------------------------------------------
 Jmp_1B_To_DeleteObject:                                        ; Offset_0x0228BC
 		jmp     (DeleteObject)                         ; Offset_0x00D314
@@ -26338,7 +27595,201 @@ Jmp_15_To_SpeedToPos:                                          ; Offset_0x023F72
 		jmp     (SpeedToPos)                           ; Offset_0x00D1DA
 ;-------------------------------------------------------------------------------
 Obj_0x4B_Buzzer:                                               ; Offset_0x023F78
-		include 'objects/obj_0x4B.asm'
+;===============================================================================
+; Object 0x4B - Buzzer Enemy in Green Hill
+; ->>> 
+;===============================================================================   
+; Offset_0x023F78:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x023F86(PC, D0), D1
+                jmp     Offset_0x023F86(PC, D1)
+;-------------------------------------------------------------------------------
+Offset_0x023F86:
+                dc.w    Offset_0x023FD8-Offset_0x023F86
+                dc.w    Offset_0x024084-Offset_0x023F86
+                dc.w    Offset_0x023FA0-Offset_0x023F86
+                dc.w    Offset_0x023F8E-Offset_0x023F86   
+;-------------------------------------------------------------------------------
+Offset_0x023F8E:
+                bsr     Jmp_16_To_SpeedToPos                   ; Offset_0x02428C
+                lea     (Buzzer_AnimateData), A1               ; Offset_0x0241CE
+                bsr     Jmp_12_To_AnimateSprite                ; Offset_0x024274
+                bra     Jmp_01_To_MarkObjGone_4                ; Offset_0x024280   
+;-------------------------------------------------------------------------------
+Offset_0x023FA0:
+                move.l  Obj_Timer(A0), A1                                ; $002A
+                tst.b   (A1)
+                beq     Jmp_1D_To_DeleteObject                 ; Offset_0x024268
+                tst.w   Obj_Control_Var_04(A1)                           ; $0030
+                bmi.s   Offset_0x023FB2
+                rts
+Offset_0x023FB2:
+                move.w  Obj_X(A1), Obj_X(A0)                      ; $0008, $0008
+                move.w  Obj_Y(A1), Obj_Y(A0)                      ; $000C, $000C
+                move.b  Obj_Status(A1), Obj_Status(A0)            ; $0022, $0022
+                move.b  Obj_Flags(A1), Obj_Flags(A0)              ; $0001, $0001
+                lea     (Buzzer_AnimateData), A1               ; Offset_0x0241CE
+                bsr     Jmp_12_To_AnimateSprite                ; Offset_0x024274
+                bra     Jmp_01_To_MarkObjGone_4                ; Offset_0x024280   
+;-------------------------------------------------------------------------------
+Offset_0x023FD8:
+                move.l  #Buzzer_Mappings, Obj_Map(A0)   ; Offset_0x0241EA, $0004
+                move.w  #$03D2, Obj_Art_VRAM(A0)                         ; $0002
+                bsr     Jmp_2B_To_ModifySpriteAttr_2P          ; Offset_0x024286
+                ori.b   #$04, Obj_Flags(A0)                              ; $0001
+                move.b  #$0A, Obj_Col_Flags(A0)                          ; $0020
+                move.b  #$04, Obj_Priority(A0)                           ; $0018
+                move.b  #$10, Obj_Width(A0)                              ; $0019
+                move.b  #$10, Obj_Height_2(A0)                           ; $0016
+                move.b  #$18, Obj_Width_2(A0)                            ; $0017
+                move.b  #$03, Obj_Priority(A0)                           ; $0018
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                bsr     Jmp_13_To_SingleObjectLoad_2           ; Offset_0x02426E
+                bne.s   Offset_0x024082
+                move.b  #$4B, Obj_Id(A1)                                 ; $0000
+                move.b  #$04, Obj_Routine(A1)                            ; $0024
+                move.l  #Buzzer_Mappings, Obj_Map(A1)   ; Offset_0x0241EA, $0004
+                move.w  #$03D2, Obj_Art_VRAM(A1)                         ; $0002
+                bsr     Jmp_06_To_ModifySpriteAttr_2P_A1       ; Offset_0x02427A
+                move.b  #$04, Obj_Priority(A1)                           ; $0018
+                move.b  #$10, Obj_Width(A1)                              ; $0019
+                move.b  Obj_Status(A0), Obj_Status(A1)            ; $0022, $0022
+                move.b  Obj_Flags(A0), Obj_Flags(A1)              ; $0001, $0001
+                move.b  #$01, Obj_Ani_Number(A1)                         ; $001C
+                move.l  A0, Obj_Timer(A1)                                ; $002A
+                move.w  Obj_X(A0), Obj_X(A1)                      ; $0008, $0008
+                move.w  Obj_Y(A0), Obj_Y(A1)                      ; $000C, $000C
+                move.w  #$0100, Obj_Control_Var_02(A0)                   ; $002E
+                move.w  #$FF00, Obj_Speed(A0)                            ; $0010
+                btst    #$00, Obj_Flags(A0)                              ; $0001
+                beq.s   Offset_0x024082
+                neg.w   Obj_Speed(A0)                                    ; $0010
+Offset_0x024082:
+                rts  
+;-------------------------------------------------------------------------------
+Offset_0x024084:
+                moveq   #$00, D0
+                move.b  Obj_Routine_2(A0), D0                            ; $0025
+                move.w  Offset_0x0240A0(PC, D0), D1
+                jsr     Offset_0x0240A0(PC, D1)
+                lea     (Buzzer_AnimateData), A1               ; Offset_0x0241CE
+                bsr     Jmp_12_To_AnimateSprite                ; Offset_0x024274
+                bra     Jmp_01_To_MarkObjGone_4                ; Offset_0x024280          
+;-------------------------------------------------------------------------------
+Offset_0x0240A0:
+                dc.w    Offset_0x0240A4-Offset_0x0240A0
+                dc.w    Offset_0x024134-Offset_0x0240A0              
+;-------------------------------------------------------------------------------
+Offset_0x0240A4:
+                bsr     Offset_0x0240E6
+                subq.w  #$01, Obj_Control_Var_04(A0)                     ; $0030
+                move.w  Obj_Control_Var_04(A0), D0                       ; $0030
+                cmpi.w  #$000F, D0
+                beq.s   Offset_0x0240CA
+                tst.w   D0
+                bpl.s   Offset_0x0240C8
+                subq.w  #$01, Obj_Control_Var_02(A0)                     ; $002E
+                bgt     Jmp_16_To_SpeedToPos                   ; Offset_0x02428C
+                move.w  #$001E, Obj_Control_Var_04(A0)                   ; $0030
+Offset_0x0240C8:
+                rts
+Offset_0x0240CA:
+                sf      Obj_Control_Var_06(A0)                           ; $0032
+                neg.w   Obj_Speed(A0)                                    ; $0010
+                bchg    #00, Obj_Flags(A0)                               ; $0001
+                bchg    #00, Obj_Status(A0)                              ; $0022
+                move.w  #$0100, Obj_Control_Var_02(A0)                   ; $002E
+                rts
+Offset_0x0240E6:
+                tst.b   Obj_Control_Var_06(A0)                           ; $0032
+                bne     Offset_0x024132
+                move.w  Obj_X(A0), D0                                    ; $0008
+                sub.w   (Player_One_Position_X).w, D0                ; $FFFFB008
+                move.w  D0, D1
+                bpl.s   Offset_0x0240FC
+                neg.w   D0
+Offset_0x0240FC:
+                cmpi.w  #$0028, D0
+                blt.s   Offset_0x024132
+                cmpi.w  #$0030, D0
+                bgt.s   Offset_0x024132
+                tst.w   D1
+                bpl.s   Offset_0x024116
+                btst    #$00, Obj_Flags(A0)                              ; $0001
+                beq.s   Offset_0x024132
+                bra.s   Offset_0x02411E
+Offset_0x024116:
+                btst    #$00, Obj_Flags(A0)                              ; $0001
+                bne.s   Offset_0x024132
+Offset_0x02411E:
+                st      Obj_Control_Var_06(A0)                           ; $0032
+                addq.b  #$02, Obj_Routine_2(A0)                          ; $0025
+                move.b  #$03, Obj_Ani_Number(A0)                         ; $001C
+                move.w  #$0032, Obj_Control_Var_08(A0)                   ; $0034
+Offset_0x024132:
+                rts     
+;-------------------------------------------------------------------------------
+Offset_0x024134:
+                move.w  Obj_Control_Var_08(A0), D0                       ; $0034
+                subq.w  #$01, D0
+                blt.s   Offset_0x024148
+                move.w  D0, Obj_Control_Var_08(A0)                       ; $0034
+                cmpi.w  #$0014, D0
+                beq.s   Offset_0x02414E
+                rts
+Offset_0x024148:
+                subq.b  #$02, Obj_Routine_2(A0)                          ; $0025
+                rts
+Offset_0x02414E:
+                jsr     (SingleObjectLoad_2)                   ; Offset_0x00E714
+                bne.s   Offset_0x0241C8
+                move.b  #$4B, Obj_Id(A1)                                 ; $0000
+                move.b  #$06, Obj_Routine(A1)                            ; $0024
+                move.l  #Buzzer_Mappings, Obj_Map(A1)   ; Offset_0x0241EA, $0004
+                move.w  #$03D2, Obj_Art_VRAM(A1)                         ; $0002
+                bsr     Jmp_06_To_ModifySpriteAttr_2P_A1       ; Offset_0x02427A
+                move.b  #$04, Obj_Priority(A1)                           ; $0018
+                move.b  #$98, Obj_Col_Flags(A1)                          ; $0020
+                move.b  #$10, Obj_Width(A1)                              ; $0019
+                move.b  Obj_Status(A0), Obj_Status(A1)            ; $0022, $0022
+                move.b  Obj_Flags(A0), Obj_Flags(A1)              ; $0001, $0001
+                move.b  #$02, Obj_Ani_Number(A1)                         ; $001C
+                move.w  Obj_X(A0), Obj_X(A1)                      ; $0008, $0008
+                move.w  Obj_Y(A0), Obj_Y(A1)                      ; $000C, $000C
+                addi.w  #$0018, Obj_Y(A1)                                ; $000C
+                move.w  #$000D, D0
+                move.w  #$0180, Obj_Speed_Y(A1)                          ; $0012
+                move.w  #$FE80, Obj_Speed(A1)                            ; $0010
+                btst    #$00, Obj_Flags(A1)                              ; $0001
+                beq.s   Offset_0x0241C8
+                neg.w   Obj_Speed(A1)                                    ; $0010
+                neg.w   D0
+Offset_0x0241C8:
+                add.w   D0, Obj_X(A1)                                    ; $0008
+                rts                                   
+;-------------------------------------------------------------------------------   
+Buzzer_AnimateData:                                            ; Offset_0x0241CE
+                dc.w    Offset_0x0241D6-Buzzer_AnimateData
+                dc.w    Offset_0x0241D9-Buzzer_AnimateData
+                dc.w    Offset_0x0241DD-Buzzer_AnimateData
+                dc.w    Offset_0x0241E1-Buzzer_AnimateData
+Offset_0x0241D6:
+                dc.b    $0F, $00, $FF
+Offset_0x0241D9:
+                dc.b    $02, $03, $04, $FF
+Offset_0x0241DD:
+                dc.b    $03, $05, $06, $FF
+Offset_0x0241E1:
+                dc.b    $09, $01, $01, $01, $01, $01, $FD, $00
+                dc.b    $00                   
+;-------------------------------------------------------------------------------
+Buzzer_Mappings:                                               ; Offset_0x0241EA
+                include 'Map/obj4B.asm'
+;===============================================================================
+; Object 0x4B - Buzzer Enemy in Green Hill
+; <<<- 
+;===============================================================================		
 ;-------------------------------------------------------------------------------
 		dc.w    $0000
 Jmp_1D_To_DeleteObject:                                        ; Offset_0x024268
@@ -26358,7 +27809,72 @@ Jmp_16_To_SpeedToPos:                                          ; Offset_0x02428C
 		dc.w    $0000
 ;-------------------------------------------------------------------------------
 Obj_0x5C_Masher:                                               ; Offset_0x024294
-		include 'objects/obj_0x5C.asm'
+;===============================================================================
+; Object 0x5C - Masher (Piranha) Enemy in Green Hill
+; ->>> 
+;===============================================================================   
+; Offset_0x024294:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x0242A6(PC, D0), D1
+                jsr     Offset_0x0242A6(PC, D1)
+                bra     Jmp_24_To_MarkObjGone                  ; Offset_0x02437C
+;------------------------------------------------------------------------------- 
+Offset_0x0242A6:
+                dc.w    Offset_0x0242AA-Offset_0x0242A6
+                dc.w    Offset_0x0242E4-Offset_0x0242A6              
+;-------------------------------------------------------------------------------  
+Offset_0x0242AA:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.l  #Masher_Mappings, Obj_Map(A0)   ; Offset_0x024342, $0004
+                move.w  #$0414, Obj_Art_VRAM(A0)                         ; $0002
+                bsr     Jmp_2C_To_ModifySpriteAttr_2P          ; Offset_0x024388
+                move.b  #$04, Obj_Flags(A0)                              ; $0001
+                move.b  #$04, Obj_Priority(A0)                           ; $0018
+                move.b  #$09, Obj_Col_Flags(A0)                          ; $0020
+                move.b  #$10, Obj_Width(A0)                              ; $0019
+                move.w  #$FC00, Obj_Speed_Y(A0)                          ; $0012
+                move.w  Obj_Y(A0), Obj_Control_Var_04(A0)         ; $000C, $0030  
+;------------------------------------------------------------------------------- 
+Offset_0x0242E4:
+                lea     (Masher_Animate_Data), A1              ; Offset_0x024330
+                bsr     Jmp_13_To_AnimateSprite                ; Offset_0x024382
+                bsr     Jmp_17_To_SpeedToPos                   ; Offset_0x02438E
+                addi.w  #$0018, Obj_Speed_Y(A0)                          ; $0012
+                move.w  Obj_Control_Var_04(A0), D0                       ; $0030
+                cmp.w   Obj_Y(A0), D0                                    ; $000C
+                bcc.s   Offset_0x02430C
+                move.w  D0, Obj_Y(A0)                                    ; $000C
+                move.w  #$FB00, Obj_Speed_Y(A0)                          ; $0012
+Offset_0x02430C:
+                move.b  #$01, Obj_Ani_Number(A0)                         ; $001C
+                subi.w  #$00C0, D0
+                cmp.w   Obj_Y(A0), D0                                    ; $000C
+                bcc.s   Offset_0x02432E
+                move.b  #$00, Obj_Ani_Number(A0)                         ; $001C
+                tst.w   Obj_Speed_Y(A0)                                  ; $0012
+                bmi.s   Offset_0x02432E
+                move.b  #$02, Obj_Ani_Number(A0)                         ; $001C
+Offset_0x02432E:
+                rts             
+;------------------------------------------------------------------------------- 
+Masher_Animate_Data:                                           ; Offset_0x024330
+                dc.w    Offset_0x024336-Masher_Animate_Data
+                dc.w    Offset_0x02433A-Masher_Animate_Data
+                dc.w    Offset_0x02433E-Masher_Animate_Data
+Offset_0x024336:
+                dc.b    $07, $00, $01, $FF
+Offset_0x02433A:
+                dc.b    $03, $00, $01, $FF
+Offset_0x02433E:
+                dc.b    $07, $00, $FF, $00    
+;-------------------------------------------------------------------------------    
+Masher_Mappings:                                               ; Offset_0x024342
+                include 'Map/obj5C.asm'
+;===============================================================================
+; Object 0x5C - Masher (Piranha) Enemy in Green Hill
+; <<<- 
+;===============================================================================		
 ;-------------------------------------------------------------------------------
 		dc.w    $0000
 Jmp_24_To_MarkObjGone:                                         ; Offset_0x02437C
@@ -26614,7 +28130,161 @@ Obj_0x9B_Turtloid_Rider:                                       ; Offset_0x028FE4
 Obj_0x9C_Enemy_Boost:                                          ; Offset_0x029060
 		include 'objects/obj_0x9C.asm'
 Obj_0x9D_Coconuts:                                             ; Offset_0x0291D8
-		include 'objects/obj_0x9D.asm'
+;===============================================================================
+; Object 0x9D - Coconuts Enemy in Green Hill
+; ->>>
+;=============================================================================== 
+; Offset_0x0291D8:
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Offset_0x0291E6(PC, D0), D1
+                jmp     Offset_0x0291E6(PC, D1)
+;-------------------------------------------------------------------------------
+Offset_0x0291E6:
+                dc.w    Offset_0x0291EE-Offset_0x0291E6
+                dc.w    Offset_0x0291FA-Offset_0x0291E6
+                dc.w    Offset_0x02928C-Offset_0x0291E6
+                dc.w    Offset_0x0292B2-Offset_0x0291E6       
+;-------------------------------------------------------------------------------
+Offset_0x0291EE:
+                bsr     Object_Settings                        ; Offset_0x027EA4
+                move.b  #$10, Obj_Timer(A0)                              ; $002A
+                rts  
+;-------------------------------------------------------------------------------
+Offset_0x0291FA:
+                bsr     Object_Check_Player_Position           ; Offset_0x027F1C
+                bclr    #$00, Obj_Flags(A0)                              ; $0001
+                bclr    #$00, Obj_Status(A0)                             ; $0022
+                tst.w   D0
+                beq.s   Offset_0x02921A
+                bset    #$00, Obj_Flags(A0)                              ; $0001
+                bset    #$00, Obj_Status(A0)                             ; $0022
+Offset_0x02921A:
+                addi.w  #$0060, D2
+                cmpi.w  #$00C0, D2
+                bcc.s   Offset_0x02922E
+                tst.b   Obj_Control_Var_02(A0)                           ; $002E
+                beq.s   Offset_0x029244
+                subq.b  #$01, Obj_Control_Var_02(A0)                     ; $002E
+Offset_0x02922E:
+                subq.b  #$01, Obj_Timer(A0)                              ; $002A
+                bmi.s   Offset_0x029238
+                bra     Jmp_26_To_MarkObjGone                  ; Offset_0x02A7A0
+Offset_0x029238:
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                bsr     Offset_0x029260
+                bra     Jmp_26_To_MarkObjGone                  ; Offset_0x02A7A0
+Offset_0x029244:
+                move.b  #$06, Obj_Routine(A0)                            ; $0024
+                move.b  #$01, Obj_Map_Id(A0)                             ; $001A
+                move.b  #$08, Obj_Timer(A0)                              ; $002A
+                move.b  #$20, Obj_Control_Var_02(A0)                     ; $002E
+                bra     Jmp_26_To_MarkObjGone                  ; Offset_0x02A7A0
+Offset_0x029260:
+                move.w  Obj_Control_Var_00(A0), D0                       ; $002C
+                cmpi.w  #$000C, D0
+                bcs.s   Offset_0x02926C
+                moveq   #$00, D0
+Offset_0x02926C:
+                lea     Offset_0x029280(PC, D0), A1
+                addq.w  #$02, D0
+                move.w  D0, Obj_Control_Var_00(A0)                       ; $002C
+                move.b  (A1)+, Obj_Speed_Y(A0)                           ; $0012
+                move.b  (A1)+, Obj_Timer(A0)                             ; $002A
+                rts    
+;------------------------------------------------------------------------------- 
+Offset_0x029280:
+                dc.b    $FF, $20, $01, $18, $FF, $10, $01, $28
+                dc.b    $FF, $20, $01, $10      
+;-------------------------------------------------------------------------------   
+Offset_0x02928C:
+                subq.b  #$01, Obj_Timer(A0)                              ; $002A
+                beq.s   Offset_0x0292A4
+                bsr     Jmp_19_To_SpeedToPos                   ; Offset_0x02A7C4
+                lea     (Coconuts_AnimateData), A1             ; Offset_0x029366
+                bsr     Jmp_17_To_AnimateSprite                ; Offset_0x02A7AC
+                bra     Jmp_26_To_MarkObjGone                  ; Offset_0x02A7A0
+Offset_0x0292A4:
+                subq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.b  #$10, Obj_Timer(A0)                              ; $002A
+                bra     Jmp_26_To_MarkObjGone                  ; Offset_0x02A7A0    
+;-------------------------------------------------------------------------------
+Offset_0x0292B2:
+                moveq   #$00, D0
+                move.b  Obj_Routine_2(A0), D0                            ; $0025
+                move.w  Offset_0x0292C4(PC, D0), D1
+                jsr     Offset_0x0292C4(PC, D1)
+                bra     Jmp_26_To_MarkObjGone                  ; Offset_0x02A7A0 
+;-------------------------------------------------------------------------------   
+Offset_0x0292C4:
+                dc.w    Offset_0x0292C8-Offset_0x0292C4
+                dc.w    Offset_0x0292E4-Offset_0x0292C4          
+;-------------------------------------------------------------------------------   
+Offset_0x0292C8:
+                subq.b  #$01, Obj_Timer(A0)                              ; $002A
+                bmi.s   Offset_0x0292D0
+                rts
+Offset_0x0292D0:
+                addq.b  #$02, Obj_Routine_2(A0)                          ; $0025
+                move.b  #$08, Obj_Timer(A0)                              ; $002A
+                move.b  #$02, Obj_Map_Id(A0)                             ; $001A
+                bra     Offset_0x029300        
+;-------------------------------------------------------------------------------
+Offset_0x0292E4:
+                subq.b  #$01, Obj_Timer(A0)                              ; $002A
+                bmi.s   Offset_0x0292EC
+                rts
+Offset_0x0292EC:
+                clr.b   Obj_Routine_2(A0)                                ; $0025
+                move.b  #$04, Obj_Routine(A0)                            ; $0024
+                move.b  #$08, Obj_Timer(A0)                              ; $002A
+                bra     Offset_0x029260
+Offset_0x029300:
+                bsr     Jmp_10_To_SingleObjectLoad             ; Offset_0x02A79A
+                bne.s   Offset_0x029352
+                move.b  #$98, Obj_Id(A1)                                 ; $0000
+                move.b  #$03, Obj_Map_Id(A1)                             ; $001A
+                move.b  #$20, Obj_Subtype(A1)                            ; $0028
+                move.w  Obj_X(A0), Obj_X(A1)                      ; $0008, $0008
+                move.w  Obj_Y(A0), Obj_Y(A1)                      ; $000C, $000C
+                addi.w  #$FFF3, Obj_Y(A1)                                ; $000C
+                ori.b   #$80, Obj_Col_Flags(A1)                          ; $0020
+                moveq   #$00, D0
+                btst    #$00, Obj_Flags(A0)                              ; $0001
+                bne.s   Offset_0x02933C
+                moveq   #$04, D0
+Offset_0x02933C:
+                lea     Offset_0x029354(PC, D0), A2
+                move.w  (A2)+, D0
+                add.w   D0, Obj_X(A1)                                    ; $0008
+                move.w  (A2)+, Obj_Speed(A1)                             ; $0010
+                lea     Coconuts_Weapon(PC), A2                ; Offset_0x028D24
+                move.l  A2, Obj_Timer(A1)                                ; $002A
+Offset_0x029352:
+                rts    
+;-------------------------------------------------------------------------------  
+Offset_0x029354:
+                dc.w    $FFF5, $0100, $000B, $FF00         
+;------------------------------------------------------------------------------- 
+Obj_0x9D_Ptr:                                                  ; Offset_0x02935C
+                dc.l    Coconuts_Mappings                      ; Offset_0x029374
+                dc.w    $03EE
+                dc.b    $04, $05, $0C, $09     
+;-------------------------------------------------------------------------------                            
+Coconuts_AnimateData:                                          ; Offset_0x029366
+                dc.w    Offset_0x02936A-Coconuts_AnimateData
+                dc.w    Offset_0x02936E-Coconuts_AnimateData
+Offset_0x02936A:
+                dc.b    $05, $00, $01, $FF
+Offset_0x02936E:
+                dc.b    $09, $01, $02, $01, $FF, $00
+;------------------------------------------------------------------------------- 
+Coconuts_Mappings:                                             ; Offset_0x029374
+                include 'Map/obj9D.asm'
+;===============================================================================
+; Object 0x9D - Coconuts Enemy in Green Hill
+; <<<-
+;===============================================================================		
 Obj_0x9E_Crawlton:                                             ; Offset_0x0293F4
 		include 'objects/obj_0x9E.asm'
 Obj_0x9F_Shellcracker:                                         ; Offset_0x0295B2
@@ -26953,7 +28623,8 @@ Touch_Hurt:                                                    ; Offset_0x02B4D4
 		bne.s   Offset_0x02B4D0
 		move.l  A1, A2
 ;-------------------------------------------------------------------------------
-Hurt_Player:                                                   ; Offset_0x02B4DE
+;Hurt_Player: HurtSonic:                                       ; Offset_0x02B4DE
+HurtCharacter:
 		tst.b   (Shield_Flag).w                              ; $FFFFFE2C
 		bne.s   Hurt_Shield                            ; Offset_0x02B506
 		tst.w   (Ring_Count).w                               ; $FFFFFE20
@@ -26963,7 +28634,7 @@ Hurt_Player:                                                   ; Offset_0x02B4DE
 		move.b  #$37, Obj_Id(A1)                                 ; $0000
 		move.w  Obj_X(A0), Obj_X(A1)                      ; $0008, $0008
 		move.w  Obj_Y(A0), Obj_Y(A1)                      ; $000C, $000C
-Hurt_Shield                                                    ; Offset_0x02B506
+Hurt_Shield:                                                   ; Offset_0x02B506
 		move.b  #$00, (Shield_Flag).w                        ; $FFFFFE2C
 		move.b  #$04, Obj_Routine(A0)                            ; $0024
 		bsr     Jmp_00_To_Sonic_ResetOnFloor           ; Offset_0x02B72C
@@ -26971,23 +28642,23 @@ Hurt_Shield                                                    ; Offset_0x02B506
 		move.w  #$FC00, Obj_Speed_Y(A0)                          ; $0012
 		move.w  #$FE00, Obj_Speed(A0)                            ; $0010
 		btst    #$06, Obj_Status(A0)                             ; $0022
-		beq.s   Offset_0x02B53C
+		beq.s   Hurt_Reverse
 		move.w  #$FE00, Obj_Speed_Y(A0)                          ; $0012
 		move.w  #$FF00, Obj_Speed(A0)                            ; $0010
-Offset_0x02B53C:
+Hurt_Reverse:
 		move.w  Obj_X(A0), D0                                    ; $0008
 		cmp.w   Obj_X(A2), D0                                    ; $0008
-		bcs.s   Offset_0x02B54A
+		bcs.s   Hurt_ChkSpikes
 		neg.w   Obj_Speed(A0)                                    ; $0010
-Offset_0x02B54A:
-		move.w  #$0000, Obj_Inertia(A0)                          ; $0014
+Hurt_ChkSpikes:
+		move.w  #$0, Obj_Inertia(A0)                             ; $0014
 		move.b  #$1A, Obj_Ani_Number(A0)                         ; $001C
 		move.w  #$0078, Obj_P_Invunerblt_Time(A0)                ; $0030
-		move.w  #$00A3, D0
-		cmpi.b  #$36, (A2)
-		bne.s   Offset_0x02B56A
-		move.w  #$00A6, D0
-Offset_0x02B56A:
+		move.w  #$A3, D0              ; play normal hurt sound
+		cmpi.b  #$36, (A2)            ; was the damage caused by spikes?
+		bne.s   Hurt_Sound            ; if not, branch
+		move.w  #$A6, D0              ; play spikes hurt sound
+Hurt_Sound:
 		jsr     (Play_Sfx)                             ; Offset_0x001512
 		moveq   #-$01, D0
 		rts
@@ -26995,7 +28666,9 @@ Offset_0x02B56A:
 Hurt_NoRings:                                                  ; Offset_0x02B574
 		tst.w   (Debug_Mode_Active_Flag).w                   ; $FFFFFFFA
 		bne     Hurt_Shield                            ; Offset_0x02B506
-Kill_Player:                                                   ; Offset_0x02B57C
+
+;Kill_Player: KillSonic:                                       ; Offset_0x02B57C
+KillCharacter:
 		tst.w   (Debug_Mode_Flag_Index).w                    ; $FFFFFE08
 		bne.s   Kill_NoDeath                           ; Offset_0x02B5D0
 		move.b  #$00, (Invincibility_Flag).w                 ; $FFFFFE2D
@@ -27011,7 +28684,7 @@ Kill_Player:                                                   ; Offset_0x02B57C
 		move.w  #$00A3, D0
 		cmpi.b  #$36, (A2)
 		bne.s   Offset_0x02B5CA
-		move.w  #$00A6, D0
+		move.w  #$A6, D0             ; play death sound
 Offset_0x02B5CA:
 		jsr     (Play_Sfx)                             ; Offset_0x001512
 Kill_NoDeath:                                                  ; Offset_0x02B5D0
@@ -27564,7 +29237,7 @@ SS_6_Animate_Data:                                             ; Offset_0x02BC2C
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para carregar o leiaute dos Est�gios Especiais - Leftover from Sonic 1
+; Routine to load the layout of the Special Stages - Leftover from Sonic 1
 ; ->>>
 ;===============================================================================
 Special_Stage_Layout_Index:                                    ; Offset_0x02BC36
@@ -27884,7 +29557,593 @@ Offset_0x02BF68:
 		nop
 ;-------------------------------------------------------------------------------
 Obj_0x09_Sonic_In_Special_Stage:                               ; Offset_0x02BF70
-		include 'objects/obj_0x09.asm'
+;===============================================================================
+; Object 0x09 - Sonic in Special Stage - Leftover from Sonic 1
+; ->>>
+;===============================================================================
+; Offset_0x02BF70:
+                tst.w   (Debug_Mode_Flag_Index).w                    ; $FFFFFE08
+                beq.s   Player_In_SS_Normal                    ; Offset_0x02BF7E
+                bsr     S1SS_FixCamera                         ; Offset_0x02C1A6
+                bra     Debug_Mode                             ; Offset_0x02DE64
+;-------------------------------------------------------------------------------                
+Player_In_SS_Normal:                                           ; Offset_0x02BF7E
+                moveq   #$00, D0
+                move.b  Obj_Routine(A0), D0                              ; $0024
+                move.w  Player_In_SS_Idx(PC, D0), D1           ; Offset_0x02BF8C
+                jmp     Player_In_SS_Idx(PC, D1)               ; Offset_0x02BF8C        
+;-------------------------------------------------------------------------------
+Player_In_SS_Idx:                                              ; Offset_0x02BF8C
+                dc.w    Player_In_SS_Main-Player_In_SS_Idx      ; Offset_0x02BF94
+                dc.w    Player_In_SS_Control-Player_In_SS_Idx   ; Offset_0x02BFD4
+                dc.w    Player_In_SS_Animate-Player_In_SS_Idx   ; Offset_0x02C1D0
+                dc.w    Player_In_SS_Exit_Test-Player_In_SS_Idx ; Offset_0x02C224
+;-------------------------------------------------------------------------------
+Player_In_SS_Main:                                             ; Offset_0x02BF94
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.b  #$0E, Obj_Height_2(A0)                           ; $0016
+                move.b  #$07, Obj_Width_2(A0)                            ; $0017
+                move.l  #Sonic_Mappings, Obj_Map(A0)    ; Offset_0x06FBE0, $0004
+                move.w  #$0780, Obj_Art_VRAM(A0)                         ; $0002
+                bsr     Jmp_32_To_ModifySpriteAttr_2P          ; Offset_0x02C614
+                move.b  #$04, Obj_Flags(A0)                              ; $0001
+                move.b  #$00, Obj_Priority(A0)                           ; $0018
+                move.b  #$02, Obj_Ani_Number(A0)                         ; $001C
+                bset    #$02, Obj_Status(A0)                             ; $0022
+                bset    #$01, Obj_Status(A0)                             ; $0022  
+;-------------------------------------------------------------------------------                   
+Player_In_SS_Control:                                          ; Offset_0x02BFD4
+                tst.w   (Debug_Mode_Active_Flag).w                   ; $FFFFFFFA
+                beq.s   Offset_0x02BFE8
+                btst    #$04, (Control_Ports_Buffer_Data+$0001).w    ; $FFFFF605
+                beq.s   Offset_0x02BFE8
+                move.w  #$0001, (Debug_Mode_Flag_Index).w            ; $FFFFFE08
+Offset_0x02BFE8:
+                move.b  #$00, Obj_P_Invunerblt_Time(A0)                  ; $0030
+                moveq   #$00, D0
+                move.b  Obj_Status(A0), D0                               ; $0022
+                andi.w  #$0002, D0
+                move.w  Player_In_SS_Modes(PC, D0), D1         ; Offset_0x02C00C
+                jsr     Player_In_SS_Modes(PC, D1)             ; Offset_0x02C00C
+                jsr     (Load_Sonic_Dynamic_PLC)               ; Offset_0x0110D4
+                jmp     (DisplaySprite)                        ; Offset_0x00D322  
+;-------------------------------------------------------------------------------
+Player_In_SS_Modes:                                            ; Offset_0x02C00C
+                dc.w    Player_In_SS_OnWall-Player_In_SS_Modes ; Offset_0x02C010
+                dc.w    Player_In_SS_InAir-Player_In_SS_Modes  ; Offset_0x02C01E       
+;-------------------------------------------------------------------------------
+Player_In_SS_OnWall:                                           ; Offset_0x02C010
+                bsr     Player_In_SS_Jump                      ; Offset_0x02C146
+                bsr     Player_In_SS_Move                      ; Offset_0x02C050
+                bsr     Player_In_SS_Fall                      ; Offset_0x02C246
+                bra.s   Player_In_SS_Display                   ; Offset_0x02C02A       
+;-------------------------------------------------------------------------------
+Player_In_SS_InAir                                             ; Offset_0x02C01E
+                bsr     Player_In_SS_Null                      ; Offset_0x02C18A
+                bsr     Player_In_SS_Move                      ; Offset_0x02C050
+                bsr     Player_In_SS_Fall                      ; Offset_0x02C246      
+;-------------------------------------------------------------------------------
+Player_In_SS_Display:                                          ; Offset_0x02C02A
+                bsr     Player_In_SS_ChkItems                  ; Offset_0x02C342
+                bsr     Player_In_SS_ChkItems2                 ; Offset_0x02C47E
+                jsr     (SpeedToPos)                           ; Offset_0x00D1DA
+                bsr     S1SS_FixCamera                         ; Offset_0x02C1A6
+                move.w  (Boss_Move_Buffer).w, D0                     ; $FFFFF750
+                add.w   (Boss_Move_Buffer+$02).w, D0                 ; $FFFFF752
+                move.w  D0, (Boss_Move_Buffer).w                     ; $FFFFF750
+                jsr     (Sonic_Animate)                        ; Offset_0x010BF2
+                rts
+;-------------------------------------------------------------------------------                
+Player_In_SS_Move:                                             ; Offset_0x02C050
+                btst    #$02, ($FFFFF602).w
+                beq.s   Offset_0x02C05C
+                bsr     Player_In_SS_MoveLeft                  ; Offset_0x02C0E8
+Offset_0x02C05C:
+                btst    #$03, ($FFFFF602).w
+                beq.s   Offset_0x02C068
+                bsr     Player_In_SS_MoveRight                 ; Offset_0x02C118
+Offset_0x02C068:
+                move.b  ($FFFFF602).w, D0
+                andi.b  #$0C, D0
+                bne.s   Offset_0x02C098
+                move.w  Obj_Inertia(A0), D0                              ; $0014
+                beq.s   Offset_0x02C098
+                bmi.s   Offset_0x02C08A
+                subi.w  #$000C, D0
+                bcc.s   Offset_0x02C084
+                move.w  #$0000, D0
+Offset_0x02C084:
+                move.w  D0, Obj_Inertia(A0)                              ; $0014
+                bra.s   Offset_0x02C098
+Offset_0x02C08A:
+                addi.w  #$000C, D0
+                bcc.s   Offset_0x02C094
+                move.w  #$0000, D0
+Offset_0x02C094:
+                move.w  D0, Obj_Inertia(A0)                              ; $0014
+Offset_0x02C098:
+                move.b  (Boss_Move_Buffer).w, D0                     ; $FFFFF750
+                addi.b  #$20, D0
+                andi.b  #$C0, D0
+                neg.b   D0
+                jsr     (CalcSine)                             ; Offset_0x003282
+                muls.w  Obj_Inertia(A0), D1                              ; $0014
+                add.l   D1, Obj_X(A0)                                    ; $0008
+                muls.w  Obj_Inertia(A0), D0                              ; $0014
+                add.l   D0, Obj_Y(A0)                                    ; $000C
+                movem.l D0/D1, -(A7)
+                move.l  Obj_Y(A0), D2                                    ; $000C
+                move.l  Obj_X(A0), D3                                    ; $0008
+                bsr     Player_In_SS_Sub                       ; Offset_0x02C2D8
+                beq.s   Offset_0x02C0E2
+                movem.l (A7)+, D0/D1
+                sub.l   D1, Obj_X(A0)                                    ; $0008
+                sub.l   D0, Obj_Y(A0)                                    ; $000C
+                move.w  #$0000, Obj_Inertia(A0)                          ; $0014
+                rts
+Offset_0x02C0E2:
+                movem.l (A7)+, D0/D1
+                rts
+;-------------------------------------------------------------------------------                
+Player_In_SS_MoveLeft:                                         ; Offset_0x02C0E8
+                bset    #$00, Obj_Status(A0)                             ; $0022
+                move.w  Obj_Inertia(A0), D0                              ; $0014
+                beq.s   Offset_0x02C0F6
+                bpl.s   Offset_0x02C10A
+Offset_0x02C0F6:
+                subi.w  #$000C, D0
+                cmpi.w  #$F800, D0
+                bgt.s   Offset_0x02C104
+                move.w  #$F800, D0
+Offset_0x02C104:
+                move.w  D0, Obj_Inertia(A0)                              ; $0014
+                rts
+Offset_0x02C10A:
+                subi.w  #$0040, D0
+                bcc.s   Offset_0x02C112
+                nop
+Offset_0x02C112:
+                move.w  D0, Obj_Inertia(A0)                              ; $0014
+                rts
+;-------------------------------------------------------------------------------                
+Player_In_SS_MoveRight:                                        ; Offset_0x02C118
+                bclr    #$00, Obj_Status(A0)                             ; $0022
+                move.w  Obj_Inertia(A0), D0                              ; $0014
+                bmi.s   Offset_0x02C138
+                addi.w  #$000C, D0
+                cmpi.w  #$0800, D0
+                blt.s   Offset_0x02C132
+                move.w  #$0800, D0
+Offset_0x02C132:
+                move.w  D0, Obj_Inertia(A0)                              ; $0014
+                bra.s   Offset_0x02C144
+Offset_0x02C138:
+                addi.w  #$0040, D0
+                bcc.s   Offset_0x02C140
+                nop
+Offset_0x02C140:
+                move.w  D0, Obj_Inertia(A0)                              ; $0014
+Offset_0x02C144:
+                rts  
+;-------------------------------------------------------------------------------  
+Player_In_SS_Jump:                                             ; Offset_0x02C146
+                move.b  ($FFFFF603).w, D0
+                andi.b  #$70, D0
+                beq.s   Offset_0x02C188
+                move.b  (Boss_Move_Buffer).w, D0                     ; $FFFFF750
+                andi.b  #$FC, D0
+                neg.b   D0
+                subi.b  #$40, D0
+                jsr     (CalcSine)                             ; Offset_0x003282
+                muls.w  #$0680, D1
+                asr.l   #$08, D1
+                move.w  D1, Obj_Speed(A0)                                ; $0010
+                muls.w  #$0680, D0
+                asr.l   #$08, D0
+                move.w  D0, Obj_Speed_Y(A0)                              ; $0012
+                bset    #$01, Obj_Status(A0)                             ; $0022
+                move.w  #$00A0, D0
+                jsr     (Play_Sfx)                             ; Offset_0x001512
+Offset_0x02C188:
+                rts       
+;-------------------------------------------------------------------------------
+Player_In_SS_Null:                                             ; Offset_0x02C18A
+                rts   ; Routine disabled by this rts
+; Offset_0x02C18C:
+                move.w  #$FC00, D1
+                cmp.w   Obj_Speed_Y(A0), D1                              ; $0012
+                ble.s   Offset_0x02C1A4
+                move.b  ($FFFFF602).w, D0
+                andi.b  #$70, D0
+                bne.s   Offset_0x02C1A4
+                move.w  D1, Obj_Speed_Y(A0)                              ; $0012
+Offset_0x02C1A4:
+                rts    
+;-------------------------------------------------------------------------------
+S1SS_FixCamera:                                                ; Offset_0x02C1A6
+                move.w  Obj_Y(A0), D2                                    ; $000C
+                move.w  Obj_X(A0), D3                                    ; $0008
+                move.w  (Camera_X).w, D0                             ; $FFFFEE00
+                subi.w  #$00A0, D3
+                bcs.s   Offset_0x02C1BE
+                sub.w   D3, D0
+                sub.w   D0, ($FFFFEE00).w
+Offset_0x02C1BE:
+                move.w  (Camera_Y).w, D0                             ; $FFFFEE04
+                subi.w  #$0070, D2
+                bcs.s   Offset_0x02C1CE
+                sub.w   D2, D0
+                sub.w   D0, ($FFFFEE04).w
+Offset_0x02C1CE:
+                rts
+;-------------------------------------------------------------------------------                
+Player_In_SS_Animate:                                          ; Offset_0x02C1D0
+                addi.w  #$0040, (Boss_Move_Buffer+$02).w             ; $FFFFF752
+                cmpi.w  #$1800, (Boss_Move_Buffer+$02).w             ; $FFFFF752
+                bne.s   Offset_0x02C1E4
+                move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
+Offset_0x02C1E4:
+                cmpi.w  #$3000, (Boss_Move_Buffer+$02).w             ; $FFFFF752
+                blt.s   Offset_0x02C202
+                move.w  #$0000, (Boss_Move_Buffer+$02).w             ; $FFFFF752
+                move.w  #$4000, (Boss_Move_Buffer).w                 ; $FFFFF750
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.w  #$003C, Obj_Player_St_Convex(A0)                 ; $0038
+Offset_0x02C202:
+                move.w  (Boss_Move_Buffer).w, D0                     ; $FFFFF750
+                add.w   (Boss_Move_Buffer+$02).w, D0                 ; $FFFFF752
+                move.w  D0, (Boss_Move_Buffer).w                     ; $FFFFF750
+                jsr     (Sonic_Animate)                        ; Offset_0x010BF2
+                jsr     (Load_Sonic_Dynamic_PLC)               ; Offset_0x0110D4
+                bsr     S1SS_FixCamera                         ; Offset_0x02C1A6
+                jmp     (DisplaySprite)                        ; Offset_0x00D322
+;-------------------------------------------------------------------------------                 
+Player_In_SS_Exit_Test:                                        ; Offset_0x02C224
+                subq.w  #$01, Obj_Player_St_Convex(A0)                   ; $0038
+                bne.s   Offset_0x02C230
+                move.b  #gm_PlayMode, (Game_Mode).w             ; $0C, $FFFFF600
+Offset_0x02C230:
+                jsr     (Sonic_Animate)                        ; Offset_0x010BF2
+                jsr     (Load_Sonic_Dynamic_PLC)               ; Offset_0x0110D4
+                bsr     S1SS_FixCamera                         ; Offset_0x02C1A6
+                jmp     (DisplaySprite)                        ; Offset_0x00D322
+;-------------------------------------------------------------------------------                
+Player_In_SS_Fall:                                             ; Offset_0x02C246
+                move.l  Obj_Y(A0), D2                                    ; $000C
+                move.l  Obj_X(A0), D3                                    ; $0008
+                move.b  (Boss_Move_Buffer).w, D0                     ; $FFFFF750
+                andi.b  #$FC, D0
+                jsr     (CalcSine)                             ; Offset_0x003282
+                move.w  Obj_Speed(A0), D4                                ; $0010
+                ext.l   D4
+                asl.l   #$08, D4
+                muls.w  #$002A, D0
+                add.l   D4, D0
+                move.w  Obj_Speed_Y(A0), D4                              ; $0012
+                ext.l   D4
+                asl.l   #$08, D4
+                muls.w  #$002A, D1
+                add.l   D4, D1
+                add.l   D0, D3
+                bsr     Player_In_SS_Sub                       ; Offset_0x02C2D8
+                beq.s   Offset_0x02C2A0
+                sub.l   D0, D3
+                moveq   #$00, D0
+                move.w  D0, Obj_Speed(A0)                                ; $0010
+                bclr    #$01, Obj_Status(A0)                             ; $0022
+                add.l   D1, D2
+                bsr     Player_In_SS_Sub                       ; Offset_0x02C2D8
+                beq.s   Offset_0x02C2B6
+                sub.l   D1, D2
+                moveq   #$00, D1
+                move.w  D1, Obj_Speed_Y(A0)                              ; $0012
+                rts
+Offset_0x02C2A0:
+                add.l   D1, D2
+                bsr     Player_In_SS_Sub                       ; Offset_0x02C2D8
+                beq.s   Offset_0x02C2C4
+                sub.l   D1, D2
+                moveq   #$00, D1
+                move.w  D1, Obj_Speed_Y(A0)                              ; $0012
+                bclr    #$01, Obj_Status(A0)                             ; $0022
+Offset_0x02C2B6:
+                asr.l   #$08, D0
+                asr.l   #$08, D1
+                move.w  D0, Obj_Speed(A0)                                ; $0010
+                move.w  D1, Obj_Speed_Y(A0)                              ; $0012
+                rts
+Offset_0x02C2C4:
+                asr.l   #$08, D0
+                asr.l   #$08, D1
+                move.w  D0, Obj_Speed(A0)                                ; $0010
+                move.w  D1, Obj_Speed_Y(A0)                              ; $0012
+                bset    #$01, Obj_Status(A0)                             ; $0022
+                rts  
+;-------------------------------------------------------------------------------
+Player_In_SS_Sub:                                              ; Offset_0x02C2D8
+                lea     (M68K_RAM_Start), A1                         ; $FFFF0000
+                moveq   #$00, D4
+                swap.w  D2
+                move.w  D2, D4
+                swap.w  D2
+                addi.w  #$0044, D4
+                divu.w  #$0018, D4
+                mulu.w  #$0080, D4
+                adda.l  D4, A1
+                moveq   #$00, D4
+                swap.w  D3
+                move.w  D3, D4
+                swap.w  D3
+                addi.w  #$0014, D4
+                divu.w  #$0018, D4
+                adda.w  D4, A1
+                moveq   #$00, D5
+                move.b  (A1)+, D4
+                bsr.s   Offset_0x02C320
+                move.b  (A1)+, D4
+                bsr.s   Offset_0x02C320
+                adda.w  #$007E, A1
+                move.b  (A1)+, D4
+                bsr.s   Offset_0x02C320
+                move.b  (A1)+, D4
+                bsr.s   Offset_0x02C320
+                tst.b   D5
+                rts
+Offset_0x02C320:
+                beq.s   Offset_0x02C334
+                cmpi.b  #$28, D4
+                beq.s   Offset_0x02C334
+                cmpi.b  #$3A, D4
+                bcs.s   Offset_0x02C336
+                cmpi.b  #$4B, D4
+                bcc.s   Offset_0x02C336
+Offset_0x02C334:
+                rts
+Offset_0x02C336:
+                move.b  D4, Obj_P_Invunerblt_Time(A0)                    ; $0030
+                move.l  A1, Obj_P_Invcbility_Time(A0)                    ; $0032
+                moveq   #-$01, D5
+                rts
+;-------------------------------------------------------------------------------                
+Player_In_SS_ChkItems: ; Touch_Rings                           ; Offset_0x02C342
+                lea     (M68K_RAM_Start), A1                         ; $FFFF0000
+                moveq   #$00, D4
+                move.w  Obj_Y(A0), D4                                    ; $000C
+                addi.w  #$0050, D4
+                divu.w  #$0018, D4
+                mulu.w  #$0080, D4
+                adda.l  D4, A1
+                moveq   #$00, D4
+                move.w  Obj_X(A0), D4                                    ; $0008
+                addi.w  #$0020, D4
+                divu.w  #$0018, D4
+                adda.w  D4, A1
+                move.b  (A1), D4
+                bne.s   Offset_0x02C37C
+                tst.b   Obj_Player_Spdsh_Cnt(A0)                         ; $003A
+                bne     Offset_0x02C44C
+                moveq   #$00, D4
+                rts
+Offset_0x02C37C:
+                cmpi.b  #$3A, D4
+                bne.s   Offset_0x02C3B8
+                bsr     Offset_0x02BAA4
+                bne.s   Offset_0x02C390
+                move.b  #$01, (A2)
+                move.l  A1, Obj_Map(A2)                                  ; $0004
+Offset_0x02C390:
+                jsr     (Add_Rings)                            ; Offset_0x00AB92
+                cmpi.w  #$0032, (Ring_Count).w                       ; $FFFFFE20
+                bcs.s   Offset_0x02C3B4
+                bset    #$00, (Ring_Life_Flag).w                     ; $FFFFFE1B
+                bne.s   Offset_0x02C3B4
+                addq.b  #$01, ($FFFFFE18).w
+                move.w  #$BF, D0                          ; play continue jingle
+                jsr     (Play_Music)                           ; Offset_0x00150C
+Offset_0x02C3B4:
+                moveq   #$00, D4
+                rts
+Offset_0x02C3B8:
+                cmpi.b  #$28, D4
+                bne.s   Offset_0x02C3E2
+                bsr     Offset_0x02BAA4
+                bne.s   Offset_0x02C3CC
+                move.b  #$03, (A2)
+                move.l  A1, Obj_Map(A2)                                  ; $0004
+Offset_0x02C3CC:
+                addq.b  #$01, (Life_Count).w                         ; $FFFFFE12
+                addq.b  #$01, (HUD_Life_Refresh_Flag).w              ; $FFFFFE1C
+                move.w  #$88, D0                    ; play Casino Night 2P music
+                jsr     (Play_Music)                           ; Offset_0x00150C
+                moveq   #$00, D4
+                rts
+Offset_0x02C3E2:
+                cmpi.b  #$3B, D4
+                bcs.s   Offset_0x02C428
+                cmpi.b  #$40, D4
+                bhi.s   Offset_0x02C428
+                bsr     Offset_0x02BAA4
+                bne.s   Offset_0x02C3FC
+                move.b  #$05, (A2)
+                move.l  A1, Obj_Map(A2)                                  ; $0004
+Offset_0x02C3FC:
+                cmpi.b  #$06, (Emerald_Count).w                      ; $FFFFFE57
+                beq.s   Offset_0x02C41A
+                subi.b  #$3B, D4
+                moveq   #$00, D0
+                move.b  (Emerald_Count).w, D0                        ; $FFFFFE57
+                lea     (Emerald_Collected_Flag_List).w, A2          ; $FFFFFE58
+                move.b  D4, $00(A2, D0)
+                addq.b  #$01, (Emerald_Count).w                      ; $FFFFFE57
+Offset_0x02C41A:
+                move.w  #$0093, D0
+                jsr     (Play_Sfx)                             ; Offset_0x001512
+                moveq   #$00, D4
+                rts
+Offset_0x02C428:
+                cmpi.b  #$41, D4
+                bne.s   Offset_0x02C434
+                move.b  #$01, Obj_Player_Spdsh_Cnt(A0)                   ; $003A
+Offset_0x02C434:
+                cmpi.b  #$4A, D4
+                bne.s   Offset_0x02C448
+                cmpi.b  #$01, Obj_Player_Spdsh_Cnt(A0)                   ; $003A
+                bne.s   Offset_0x02C448
+                move.b  #$02, Obj_Player_Spdsh_Cnt(A0)                   ; $003A
+Offset_0x02C448:
+                moveq   #-$01, D4
+                rts
+Offset_0x02C44C:
+                cmpi.b  #$02, Obj_Player_Spdsh_Cnt(A0)                   ; $003A
+                bne.s   Offset_0x02C476
+                lea     ($FFFF1020), A1
+                moveq   #$3F, D1
+Offset_0x02C45C:
+                moveq   #$3F, D2
+Offset_0x02C45E:
+                cmpi.b  #$41, (A1)
+                bne.s   Offset_0x02C468
+                move.b  #$2C, (A1)
+Offset_0x02C468:
+                addq.w  #$01, A1
+                dbra    D2, Offset_0x02C45E
+                lea     Obj_Size(A1), A1                                 ; $0040
+                dbra    D1, Offset_0x02C45C
+Offset_0x02C476:
+                clr.b   Obj_Player_Spdsh_Cnt(A0)                         ; $003A
+                moveq   #$00, D4
+                rts
+;-------------------------------------------------------------------------------                
+Player_In_SS_ChkItems2:                                        ; Offset_0x02C47E
+                move.b  Obj_P_Invunerblt_Time(A0), D0                    ; $0030
+                bne.s   Offset_0x02C49E
+                subq.b  #$01, Obj_Player_Next_Tilt(A0)                   ; $0036
+                bpl.s   Offset_0x02C490
+                move.b  #$00, Obj_Player_Next_Tilt(A0)                   ; $0036
+Offset_0x02C490:
+                subq.b  #$01, Obj_Player_Tilt(A0)                        ; $0037
+                bpl.s   Offset_0x02C49C
+                move.b  #$00, Obj_Player_Tilt(A0)                        ; $0037
+Offset_0x02C49C:
+                rts
+Offset_0x02C49E:
+                cmpi.b  #$25, D0
+                bne.s   Offset_0x02C516
+                move.l  Obj_P_Invcbility_Time(A0), D1                    ; $0032
+                subi.l  #$FFFF0001, D1
+                move.w  D1, D2
+                andi.w  #$007F, D1
+                mulu.w  #$0018, D1
+                subi.w  #$0014, D1
+                lsr.w   #$07, D2
+                andi.w  #$007F, D2
+                mulu.w  #$0018, D2
+                subi.w  #$0044, D2
+                sub.w   Obj_X(A0), D1                                    ; $0008
+                sub.w   Obj_Y(A0), D2                                    ; $000C
+                jsr     (CalcAngle)                            ; Offset_0x00351A
+                jsr     (CalcSine)                             ; Offset_0x003282
+                muls.w  #$F900, D1
+                asr.l   #$08, D1
+                move.w  D1, Obj_Speed(A0)                                ; $0010
+                muls.w  #$F900, D0
+                asr.l   #$08, D0
+                move.w  D0, Obj_Speed_Y(A0)                              ; $0012
+                bset    #$01, Obj_Status(A0)                             ; $0022
+                bsr     Offset_0x02BAA4
+                bne.s   Offset_0x02C50C
+                move.b  #$02, (A2)
+                move.l  Obj_P_Invcbility_Time(A0), D0                    ; $0032
+                subq.l  #$01, D0
+                move.l  D0, Obj_Map(A2)                                  ; $0004
+Offset_0x02C50C:
+                move.w  #$00B4, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+Offset_0x02C516:
+                cmpi.b  #$27, D0
+                bne.s   Offset_0x02C52C
+                addq.b  #$02, Obj_Routine(A0)                            ; $0024
+                move.w  #$00A8, D0
+                jsr     (Play_Sfx)                             ; Offset_0x001512
+                rts
+Offset_0x02C52C:
+                cmpi.b  #$29, D0
+                bne.s   Offset_0x02C560
+                tst.b   Obj_Player_Next_Tilt(A0)                         ; $0036
+                bne     Offset_0x02C610
+                move.b  #$1E, Obj_Player_Next_Tilt(A0)                   ; $0036
+                btst    #$06, (Boss_Move_Buffer+$03).w               ; $FFFFF753
+                beq.s   Offset_0x02C556
+                asl.w   (Boss_Move_Buffer+$02).w                     ; $FFFFF752
+                move.l  Obj_P_Invcbility_Time(A0), A1                    ; $0032
+                subq.l  #$01, A1
+                move.b  #$2A, (A1)
+Offset_0x02C556:
+                move.w  #$00A9, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+Offset_0x02C560:
+                cmpi.b  #$2A, D0
+                bne.s   Offset_0x02C594
+                tst.b   Obj_Player_Next_Tilt(A0)                         ; $0036
+                bne     Offset_0x02C610
+                move.b  #$1E, Obj_Player_Next_Tilt(A0)                   ; $0036
+                btst    #$06, (Boss_Move_Buffer+$03).w               ; $FFFFF753
+                bne.s   Offset_0x02C58A
+                asr.w   (Boss_Move_Buffer+$02).w                     ; $FFFFF752
+                move.l  Obj_P_Invcbility_Time(A0), A1                    ; $0032
+                subq.l  #$01, A1
+                move.b  #$29, (A1)
+Offset_0x02C58A:
+                move.w  #$00A9, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+Offset_0x02C594:
+                cmpi.b  #$2B, D0
+                bne.s   Offset_0x02C5CA
+                tst.b   Obj_Player_Tilt(A0)                              ; $0037
+                bne     Offset_0x02C610
+                move.b  #$1E, Obj_Player_Tilt(A0)                        ; $0037
+                bsr     Offset_0x02BAA4
+                bne.s   Offset_0x02C5BC
+                move.b  #$04, (A2)
+                move.l  Obj_P_Invcbility_Time(A0), D0                    ; $0032
+                subq.l  #$01, D0
+                move.l  D0, Obj_Map(A2)                                  ; $0004
+Offset_0x02C5BC:
+                neg.w   (Boss_Move_Buffer+$02).w                     ; $FFFFF752
+                move.w  #$00A9, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+Offset_0x02C5CA:
+                cmpi.b  #$2D, D0
+                beq.s   Offset_0x02C5E2
+                cmpi.b  #$2E, D0
+                beq.s   Offset_0x02C5E2
+                cmpi.b  #$2F, D0
+                beq.s   Offset_0x02C5E2
+                cmpi.b  #$30, D0
+                bne.s   Offset_0x02C610
+Offset_0x02C5E2:
+                bsr     Offset_0x02BAA4
+                bne.s   Offset_0x02C606
+                move.b  #$06, (A2)
+                move.l  Obj_P_Invcbility_Time(A0), A1                    ; $0032
+                subq.l  #$01, A1
+                move.l  A1, Obj_Map(A2)                                  ; $0004
+                move.b  (A1), D0
+                addq.b  #$01, D0
+                cmpi.b  #$30, D0
+                bls.s   Offset_0x02C602
+                clr.b   D0
+Offset_0x02C602:
+                move.b  D0, Obj_Map(A2)                                  ; $0004
+Offset_0x02C606:
+                move.w  #$BA, D0
+                jmp     (Play_Sfx)                             ; Offset_0x001512
+Offset_0x02C610:
+                rts                
+;===============================================================================
+; Object 0x09 - Sonic in Special Stage - Leftover from Sonic 1
+; <<<-
+;===============================================================================
 ;-------------------------------------------------------------------------------
 Obj_Null_3:                                                    ; Offset_0x02C612
 		rts
@@ -27892,8 +30151,8 @@ Jmp_32_To_ModifySpriteAttr_2P:                                 ; Offset_0x02C614
 		jmp     (ModifySpriteAttr_2P)                  ; Offset_0x00DBBE
 		dc.w    $0000
 ;===============================================================================
-; Rotina para carregar os gr�ficos dinamicamente para a VRAM
-; Ex: Flores na Emerald Hill, �leo na Oil Ocean, etc...
+; Routine to load the graphics dynamically to the VRAM
+; E.g.: Flowers at Emerald Hill, Oil at Oil Ocean, etc...
 ; ->>>
 ;===============================================================================
 Dynamic_Art_Cues:                                              ; Offset_0x02C61C
@@ -27997,14 +30256,13 @@ Offset_0x02C6D4:
 Offset_0x02C6F0:
 		bra     Offset_0x02C7B4
 ;-------------------------------------------------------------------------------
-; Array dos endere�os da RAM para serem usados pelos sprites animados da
-; Hill Top, Os sprites s�o descomprimidos para RAM e carregados dinamicamente
-; a partir da RAM. Note que nestes endere�os est�o os Chunks (128x128) da Hill
-; Top, esses chunks n�o s�o usados para o layout. Deve se tomar cuidado ao
-; editar a Hill Top a partir de editores de fases, pois os editores n�o
-; reconhecem que os chunks n�o podem ser usado e se voc� us�-los ao carregar
-; a fase durante o jogo notar� que os chunks est�o diferentes do que se viu
-; no editor de fases.
+; Array of RAM addresses to be used by the RAM animated sprites in
+; Hill Top. Sprites are uncompressed to RAM and dynamically loaded
+; from RAM. Note that in these addresses are the Chunks (128x128) from Hill
+; Top, but these chunks aren't used for the layout. Be careful when editing
+; Hill Top in level editors, as editors don't recognize that those chunks 
+; cannot be used and if you use them and load the level ingame,
+; notice that the chunks are different from what was seen in the level editor.
 ;-------------------------------------------------------------------------------
 HTz_RAM_Dyn_Sprites:                                           ; Offset_0x02C6F4
 		dc.w    $0080, $0180, $0280, $0580, $0600, $0700, $0080, $0180
@@ -28135,200 +30393,200 @@ Offset_0x02C8B6:
 		rts
 ;-------------------------------------------------------------------------------
 GHz_Animate_Script:                                            ; Offset_0x02C8C8
-		dc.w    $0004                      ; Total de Anima��es
+		dc.w    $0004                      ; Total Animations
 		dc.l    ($FF<<$18)|Art_GHz_Flower_1            ; Offset_0x030000
 		dc.w    $7280                      ; VRAM
-		dc.w    $0602                      ; Quadros / Tiles
-		dc.w    $007F, $0213, $0007, $0207 ; Carregar quadro / Tempo do quadro
-		dc.w    $0007, $0207               ; Carregar quadro / Tempo do quadro
+		dc.w    $0602                      ; Frames / Tiles
+		dc.w    $007F, $0213, $0007, $0207 ; Load Frame / Frame Time
+		dc.w    $0007, $0207               ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_GHz_Flower_2            ; Offset_0x030080
 		dc.w    $72C0                      ; VRAM
-		dc.w    $0802                      ; Quadros / Tiles
-		dc.w    $027F, $000B, $020B, $000B ; Carregar quadro / Tempo do quadro
-		dc.w    $0205, $0005, $0205, $0005 ; Carregar quadro / Tempo do quadro
+		dc.w    $0802                      ; Frames / Tiles
+		dc.w    $027F, $000B, $020B, $000B ; Load Frame / Frame Time
+		dc.w    $0205, $0005, $0205, $0005 ; Load Frame / Frame Time
 		dc.l    ($07<<$18)|Art_GHz_Flower_3            ; Offset_0x030100
 		dc.w    $7300                      ; VRAM
-		dc.w    $0202                      ; Quadros / Tiles
-		dc.w    $0002                      ; Carregar quadro / Tempo do quadro
+		dc.w    $0202                      ; Frames / Tiles
+		dc.w    $0002                      ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_GHz_Flower_4            ; Offset_0x030180
 		dc.w    $7340                      ; VRAM
-		dc.w    $0802                      ; Quadros / Tiles
-		dc.w    $007F, $0207, $0007, $0207 ; Carregar quadro / Tempo do quadro
-		dc.w    $0007, $020B, $000B, $020B ; Carregar quadro / Tempo do quadro
+		dc.w    $0802                      ; Frames / Tiles
+		dc.w    $007F, $0207, $0007, $0207 ; Load Frame / Frame Time
+		dc.w    $0007, $020B, $000B, $020B ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_GHz_Dyn_Wall            ; Offset_0x030200
 		dc.w    $7380                      ; VRAM
-		dc.w    $0602                      ; Quadros / Tiles
-		dc.w    $0017, $0209, $040B, $0617 ; Carregar quadro / Tempo do quadro
-		dc.w    $040B, $0209               ; Carregar quadro / Tempo do quadro
+		dc.w    $0602                      ; Frames / Tiles
+		dc.w    $0017, $0209, $040B, $0617 ; Load Frame / Frame Time
+		dc.w    $040B, $0209               ; Load Frame / Frame Time
 ;-------------------------------------------------------------------------------
 Mz_Animate_Script:                                             ; Offset_0x02C92C
-		dc.w    $0003                      ; Total de Anima��es
+		dc.w    $0003                      ; Total Animations
 		dc.l    Art_Mz_Spinnig_Cylinder                ; Offset_0x03102A
 		dc.w    $6980                      ; VRAM
-		dc.w    $0810                      ; Quadros / Tiles
-		dc.w    $0010, $2030, $4050, $6070 ; Carregar quadro / Tempo do quadro
+		dc.w    $0810                      ; Frames / Tiles
+		dc.w    $0010, $2030, $4050, $6070 ; Load Frame / Frame Time
 		dc.l    ($0D<<$18)|Art_Mz_Lava                 ; Offset_0x03202A
 		dc.w    $6800                      ; VRAM
-		dc.w    $060C                      ; Quadros / Tiles
-		dc.w    $000C, $1824, $180C        ; Carregar quadro / Tempo do quadro
+		dc.w    $060C                      ; Frames / Tiles
+		dc.w    $000C, $1824, $180C        ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_Mz_Pistons              ; Offset_0x03262A
 		dc.w    $6B80                      ; VRAM
-		dc.w    $0406                      ; Quadros / Tiles
-		dc.w    $0013, $0607, $0C13, $0607 ; Carregar quadro / Tempo do quadro
+		dc.w    $0406                      ; Frames / Tiles
+		dc.w    $0013, $0607, $0C13, $0607 ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_Mz_Pistons              ; Offset_0x03262A
 		dc.w    $6C40                      ; VRAM
-		dc.w    $0406                      ; Quadros / Tiles
-		dc.w    $0C13, $0607, $0013, $0607 ; Carregar quadro / Tempo do quadro
+		dc.w    $0406                      ; Frames / Tiles
+		dc.w    $0C13, $0607, $0013, $0607 ; Load Frame / Frame Time
 ;-------------------------------------------------------------------------------
 HTz_Animate_Script:                                            ; Offset_0x02C96C
-		dc.w    $0004                      ; Total de Anima��es
+		dc.w    $0004                      ; Total Animations
 		dc.l    ($FF<<$18)|Art_HTz_Flower_1            ; Offset_0x030000
 		dc.w    $7280                      ; VRAM
-		dc.w    $0602                      ; Quadros / Tiles
-		dc.w    $007F, $0213, $0007, $0207 ; Carregar quadro / Tempo do quadro
-		dc.w    $0007, $0207               ; Carregar quadro / Tempo do quadro
+		dc.w    $0602                      ; Frames / Tiles
+		dc.w    $007F, $0213, $0007, $0207 ; Load Frame / Frame Time
+		dc.w    $0007, $0207               ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_HTz_Flower_2            ; Offset_0x030080
 		dc.w    $72C0                      ; VRAM
-		dc.w    $0802                      ; Quadros / Tiles
-		dc.w    $027F, $000B, $020B, $000B ; Carregar quadro / Tempo do quadro
-		dc.w    $0205, $0005, $0205, $0005 ; Carregar quadro / Tempo do quadro
+		dc.w    $0802                      ; Frames / Tiles
+		dc.w    $027F, $000B, $020B, $000B ; Load Frame / Frame Time
+		dc.w    $0205, $0005, $0205, $0005 ; Load Frame / Frame Time
 		dc.l    ($07<<$18)|Art_HTz_Flower_3            ; Offset_0x030100
 		dc.w    $7300                      ; VRAM
-		dc.w    $0202                      ; Quadros / Tiles
-		dc.w    $0002                      ; Carregar quadro / Tempo do quadro
+		dc.w    $0202                      ; Frames / Tiles
+		dc.w    $0002                      ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_HTz_Flower_4            ; Offset_0x030180
 		dc.w    $7340                      ; VRAM
-		dc.w    $0802                      ; Quadros / Tiles
-		dc.w    $007F, $0207, $0007, $0207 ; Carregar quadro / Tempo do quadro
-		dc.w    $0007, $020B, $000B, $020B ; Carregar quadro / Tempo do quadro
+		dc.w    $0802                      ; Frames / Tiles
+		dc.w    $007F, $0207, $0007, $0207 ; Load Frame / Frame Time
+		dc.w    $0007, $020B, $000B, $020B ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_HTz_Dyn_Wall            ; Offset_0x030200
 		dc.w    $7380                      ; VRAM
-		dc.w    $0602                      ; Quadros / Tiles
-		dc.w    $0017, $0209, $040B, $0617 ; Carregar quadro / Tempo do quadro
-		dc.w    $040B, $0209               ; Carregar quadro / Tempo do quadro
+		dc.w    $0602                      ; Frames / Tiles
+		dc.w    $0017, $0209, $040B, $0617 ; Load Frame / Frame Time
+		dc.w    $040B, $0209               ; Load Frame / Frame Time
 ;-------------------------------------------------------------------------------
 HPz_Animate_Script:                                            ; Offset_0x02C9D0
-		dc.w    $0002                      ; Total de Anima��es
+		dc.w    $0002                      ; Total Animations
 		dc.l    ($08<<$18)|Art_HPz_Orbs                ; Offset_0x032C6A
 		dc.w    $5D00                      ; VRAM
-		dc.w    $0608                      ; Quadros / Tiles
-		dc.w    $0000, $0810, $1008        ; Carregar quadro / Tempo do quadro
+		dc.w    $0608                      ; Frames / Tiles
+		dc.w    $0000, $0810, $1008        ; Load Frame / Frame Time
 		dc.l    ($08<<$18)|Art_HPz_Orbs                ; Offset_0x032C6A
 		dc.w    $5E00                      ; VRAM
-		dc.w    $0608                      ; Quadros / Tiles
-		dc.w    $0810, $1008, $0000        ; Carregar quadro / Tempo do quadro
+		dc.w    $0608                      ; Frames / Tiles
+		dc.w    $0810, $1008, $0000        ; Load Frame / Frame Time
 		dc.l    ($08<<$18)|Art_HPz_Orbs                ; Offset_0x032C6A
 		dc.w    $5F00                      ; VRAM
-		dc.w    $0608                      ; Quadros / Tiles
-		dc.w    $1008, $0000, $0810        ; Carregar quadro / Tempo do quadro
+		dc.w    $0608                      ; Frames / Tiles
+		dc.w    $1008, $0000, $0810        ; Load Frame / Frame Time
 ;-------------------------------------------------------------------------------
 OOz_Animate_Script:                                            ; Offset_0x02C9FC
-		dc.w    $0004                      ; Total de Anima��es
+		dc.w    $0004                      ; Total Animations
 		dc.l    ($FF<<$18)|Art_OOz_Red_Balls           ; Offset_0x032F6A
 		dc.w    $56C0                      ; VRAM
-		dc.w    $0404                      ; Quadros / Tiles
-		dc.w    $000B, $0405, $0809, $0403 ; Carregar quadro / Tempo do quadro
+		dc.w    $0404                      ; Frames / Tiles
+		dc.w    $000B, $0405, $0809, $0403 ; Load Frame / Frame Time
 		dc.l    ($06<<$18)|Art_OOz_Rotating_Square_1   ; Offset_0x0330EA
 		dc.w    $5740                      ; VRAM
-		dc.w    $0404                      ; Quadros / Tiles
-		dc.w    $0004, $080C               ; Carregar quadro / Tempo do quadro
+		dc.w    $0404                      ; Frames / Tiles
+		dc.w    $0004, $080C               ; Load Frame / Frame Time
 		dc.l    ($06<<$18)|Art_OOz_Rotating_Square_2   ; Offset_0x0332EA
 		dc.w    $57C0                      ; VRAM
-		dc.w    $0404                      ; Quadros / Tiles
-		dc.w    $0004, $080C               ; Carregar quadro / Tempo do quadro
+		dc.w    $0404                      ; Frames / Tiles
+		dc.w    $0004, $080C               ; Load Frame / Frame Time
 		dc.l    ($11<<$18)|Art_OOz_Oil_1               ; Offset_0x0334EA
 		dc.w    $5840                      ; VRAM
-		dc.w    $0610                      ; Quadros / Tiles
-		dc.w    $0010, $2030, $2010        ; Carregar quadro / Tempo do quadro
+		dc.w    $0610                      ; Frames / Tiles
+		dc.w    $0010, $2030, $2010        ; Load Frame / Frame Time
 		dc.l    ($11<<$18)|Art_OOz_Oil_2               ; Offset_0x033CEA
 		dc.w    $5A40                      ; VRAM
-		dc.w    $0610                      ; Quadros / Tiles
-		dc.w    $0010, $2030, $2010        ; Carregar quadro / Tempo do quadro
+		dc.w    $0610                      ; Frames / Tiles
+		dc.w    $0010, $2030, $2010        ; Load Frame / Frame Time
 ;-------------------------------------------------------------------------------
 CNz_Animate_Script:                                            ; Offset_0x02CA42
-		dc.w    $0007                      ; Total de Anima��es
+		dc.w    $0007                      ; Total Animations
 		dc.l    ($FF<<$18)|Art_CNz_Blue_Cards          ; Offset_0x0344EA
 		dc.w    $A600                      ; VRAM
-		dc.w    $1004                      ; Quadros / Tiles
-		dc.w    $00C7, $1005, $1005, $1005 ; Carregar quadro / Tempo do quadro
-		dc.w    $00C7, $1005, $1005, $1005 ; Carregar quadro / Tempo do quadro
-		dc.w    $0005, $1005, $1005, $1005 ; Carregar quadro / Tempo do quadro
-		dc.w    $0005, $1005, $1005, $1005 ; Carregar quadro / Tempo do quadro
+		dc.w    $1004                      ; Frames / Tiles
+		dc.w    $00C7, $1005, $1005, $1005 ; Load Frame / Frame Time
+		dc.w    $00C7, $1005, $1005, $1005 ; Load Frame / Frame Time
+		dc.w    $0005, $1005, $1005, $1005 ; Load Frame / Frame Time
+		dc.w    $0005, $1005, $1005, $1005 ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_CNz_Blue_Cards          ; Offset_0x0344EA
 		dc.w    $A680
-		dc.w    $1004                      ; Quadros / Tiles
-		dc.w    $04C7, $1405, $2005, $2805 ; Carregar quadro / Tempo do quadro
-		dc.w    $30C7, $3805, $2005, $4005 ; Carregar quadro / Tempo do quadro
-		dc.w    $0405, $1405, $2005, $2805 ; Carregar quadro / Tempo do quadro
-		dc.w    $3005, $3805, $2005, $4005 ; Carregar quadro / Tempo do quadro
+		dc.w    $1004                      ; Frames / Tiles
+		dc.w    $04C7, $1405, $2005, $2805 ; Load Frame / Frame Time
+		dc.w    $30C7, $3805, $2005, $4005 ; Load Frame / Frame Time
+		dc.w    $0405, $1405, $2005, $2805 ; Load Frame / Frame Time
+		dc.w    $3005, $3805, $2005, $4005 ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_CNz_Blue_Cards          ; Offset_0x0344EA
 		dc.w    $A700                      ; VRAM
-		dc.w    $1004                      ; Quadros / Tiles
-		dc.w    $08C7, $1805, $2405, $2C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $34C7, $3C05, $2405, $4405 ; Carregar quadro / Tempo do quadro
-		dc.w    $0805, $1805, $2405, $2C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $3405, $3C05, $2405, $4405 ; Carregar quadro / Tempo do quadro
+		dc.w    $1004                      ; Frames / Tiles
+		dc.w    $08C7, $1805, $2405, $2C05 ; Load Frame / Frame Time
+		dc.w    $34C7, $3C05, $2405, $4405 ; Load Frame / Frame Time
+		dc.w    $0805, $1805, $2405, $2C05 ; Load Frame / Frame Time
+		dc.w    $3405, $3C05, $2405, $4405 ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_CNz_Blue_Cards          ; Offset_0x0344EA
 		dc.w    $A780                      ; VRAM
-		dc.w    $1004                      ; Quadros / Tiles
-		dc.w    $0CC7, $1C05, $1C05, $1C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $0CC7, $1C05, $1C05, $1C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $0C05, $1C05, $1C05, $1C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $0C05, $1C05, $1C05, $1C05 ; Carregar quadro / Tempo do quadro
+		dc.w    $1004                      ; Frames / Tiles
+		dc.w    $0CC7, $1C05, $1C05, $1C05 ; Load Frame / Frame Time
+		dc.w    $0CC7, $1C05, $1C05, $1C05 ; Load Frame / Frame Time
+		dc.w    $0C05, $1C05, $1C05, $1C05 ; Load Frame / Frame Time
+		dc.w    $0C05, $1C05, $1C05, $1C05 ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_CNz_Pink_Cards          ; Offset_0x034DEA
 		dc.w    $A400                      ; VRAM
-		dc.w    $1004                      ; Quadros / Tiles
-		dc.w    $0005, $1005, $1005, $1005 ; Carregar quadro / Tempo do quadro
-		dc.w    $3005, $1005, $1005, $1005 ; Carregar quadro / Tempo do quadro
-		dc.w    $00C7, $1005, $1005, $1005 ; Carregar quadro / Tempo do quadro
-		dc.w    $30C7, $1005, $1005, $1005 ; Carregar quadro / Tempo do quadro
+		dc.w    $1004                      ; Frames / Tiles
+		dc.w    $0005, $1005, $1005, $1005 ; Load Frame / Frame Time
+		dc.w    $3005, $1005, $1005, $1005 ; Load Frame / Frame Time
+		dc.w    $00C7, $1005, $1005, $1005 ; Load Frame / Frame Time
+		dc.w    $30C7, $1005, $1005, $1005 ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_CNz_Pink_Cards          ; Offset_0x034DEA
 		dc.w    $A480                      ; VRAM
-		dc.w    $1004                      ; Quadros / Tiles
-		dc.w    $0405, $1405, $2005, $2805 ; Carregar quadro / Tempo do quadro
-		dc.w    $3405, $4005, $2005, $4805 ; Carregar quadro / Tempo do quadro
-		dc.w    $04C7, $1405, $2005, $2805 ; Carregar quadro / Tempo do quadro
-		dc.w    $34C7, $4005, $2005, $4805 ; Carregar quadro / Tempo do quadro
+		dc.w    $1004                      ; Frames / Tiles
+		dc.w    $0405, $1405, $2005, $2805 ; Load Frame / Frame Time
+		dc.w    $3405, $4005, $2005, $4805 ; Load Frame / Frame Time
+		dc.w    $04C7, $1405, $2005, $2805 ; Load Frame / Frame Time
+		dc.w    $34C7, $4005, $2005, $4805 ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_CNz_Pink_Cards          ; Offset_0x034DEA
 		dc.w    $A500                      ; VRAM
-		dc.w    $1004                      ; Quadros / Tiles
-		dc.w    $0805, $1805, $2405, $2C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $3805, $4405, $2405, $4C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $08C7, $1805, $2405, $2C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $38C7, $4405, $2405, $4C05 ; Carregar quadro / Tempo do quadro
+		dc.w    $1004                      ; Frames / Tiles
+		dc.w    $0805, $1805, $2405, $2C05 ; Load Frame / Frame Time
+		dc.w    $3805, $4405, $2405, $4C05 ; Load Frame / Frame Time
+		dc.w    $08C7, $1805, $2405, $2C05 ; Load Frame / Frame Time
+		dc.w    $38C7, $4405, $2405, $4C05 ; Load Frame / Frame Time
 		dc.l    ($FF<<$18)|Art_CNz_Pink_Cards          ; Offset_0x034DEA
 		dc.w    $A580                      ; VRAM
-		dc.w    $1004                      ; Quadros / Tiles
-		dc.w    $0C05, $1C05, $1C05, $1C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $3C05, $1C05, $1C05, $1C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $0CC7, $1C05, $1C05, $1C05 ; Carregar quadro / Tempo do quadro
-		dc.w    $3CC7, $1C05, $1C05, $1C05 ; Carregar quadro / Tempo do quadro
+		dc.w    $1004                      ; Frames / Tiles
+		dc.w    $0C05, $1C05, $1C05, $1C05 ; Load Frame / Frame Time
+		dc.w    $3C05, $1C05, $1C05, $1C05 ; Load Frame / Frame Time
+		dc.w    $0CC7, $1C05, $1C05, $1C05 ; Load Frame / Frame Time
+		dc.w    $3CC7, $1C05, $1C05, $1C05 ; Load Frame / Frame Time
 ;-------------------------------------------------------------------------------
 CPz_Animate_Script:                                            ; Offset_0x02CB84
-		dc.w    $0000                      ; Total de Anima��es
+		dc.w    $0000                      ; Total Animations
 		dc.l    ($04<<$18)|Art_CPz_Dyn_Background ; Offset_0x0363EA
 		dc.w    $6E00                      ; VRAM
-		dc.w    $0802                      ; Quadros / Tiles
-		dc.w    $0002, $0406, $080A, $0C0E ; Carregar quadro / Tempo do quadro
+		dc.w    $0802                      ; Frames / Tiles
+		dc.w    $0002, $0406, $080A, $0C0E ; Load Frame / Frame Time
 ;-------------------------------------------------------------------------------
 NGHz_Animate_Script:                                           ; Offset_0x02CB96
-		dc.w    $0003                      ; Total de Anima��es
+		dc.w    $0003                      ; Total Animations
 		dc.l    ($05<<$18)|Art_NGHz_Water_Falls_1      ; Offset_0x0365EA
 		dc.w    $8780                      ; VRAM
-		dc.w    $0204                      ; Quadros / Tiles
-		dc.w    $0004                      ; Carregar quadro / Tempo do quadro
+		dc.w    $0204                      ; Frames / Tiles
+		dc.w    $0004                      ; Load Frame / Frame Time
 		dc.l    ($05<<$18)|Art_NGHz_Water_Falls_1      ; Offset_0x0365EA
 		dc.w    $8600                      ; VRAM
-		dc.w    $0204                      ; Quadros / Tiles
-		dc.w    $0400                      ; Carregar quadro / Tempo do quadro
+		dc.w    $0204                      ; Frames / Tiles
+		dc.w    $0400                      ; Load Frame / Frame Time
 		dc.l    ($05<<$18)|Art_NGHz_Water_Falls_2      ; Offset_0x0366EA
 		dc.w    $8580                      ; VRAM
-		dc.w    $0204                      ; Quadros / Tiles
-		dc.w    $0004                      ; Carregar quadro / Tempo do quadro
+		dc.w    $0204                      ; Frames / Tiles
+		dc.w    $0004                      ; Load Frame / Frame Time
 		dc.l    ($05<<$18)|Art_NGHz_Water_Falls_3      ; Offset_0x0367EA
 		dc.w    $8500                      ; VRAM
-		dc.w    $0204                      ; Quadros / Tiles
-		dc.w    $0004                      ; Carregar quadro / Tempo do quadro
+		dc.w    $0204                      ; Frames / Tiles
+		dc.w    $0004                      ; Load Frame / Frame Time
 Lvl1_Animate_Script:                                           ; Offset_0x02CBC0
 Wz_Animate_Script:                                             ; Offset_0x02CBC0
 Lvl3_Animate_Script:                                           ; Offset_0x02CBC0
@@ -28342,8 +30600,8 @@ DEz_Animate_Script:                                            ; Offset_0x02CBC0
 Offset_0x02CBC8:
 		rts
 ;===============================================================================
-; Rotina para carregar os gr�ficos dinamicamente para a VRAM
-; Ex: Flores na Emerald Hill, �leo na Oil Ocean, etc...
+; Routine to load the graphics dynamically to the VRAM
+; E.g.: Flowers at Emerald Hill, Oil at Oil Ocean, etc...
 ; <<<-
 ;===============================================================================
 
@@ -28412,7 +30670,7 @@ Offset_0x02CBFE:
 ;===============================================================================
 
 ;===============================================================================
-; Rotina para carregar os mapeamentos para os gr�ficos din�micos das fases
+; Routine for loading the mappings to the dynamic graphics of the zones
 ; ->>>
 ;===============================================================================
 Load_16x16_Mappings_For_Dyn_Sprites:                           ; Offset_0x02CC94
@@ -28475,8 +30733,8 @@ Map16Delta_Index:                                              ; Offset_0x02CCFC
 ;-------------------------------------------------------------------------------
 Map16Delta_GHz:                                                ; Offset_0x02CD1E
 Map16Delta_HTz:                                                ; Offset_0x02CD1E
-		dc.w    $1788 ; Endere�o da RAM para carregar os mapeamentos ($1788+$FFFF9000) -> adda.w  (A0)+, A1
-		dc.w    $003B ; Quantidade de Words a serem movidas para RAM    ($0000..$003B) -> move.w  (A0)+, D1
+		dc.w    $1788 ; RAM address to load the mappings ($1788+$FFFF9000) -> adda.w  (A0)+, A1
+		dc.w    $003B ; Number of Words to be moved to RAM    ($0000..$003B) -> move.w  (A0)+, D1
 		dc.w    $4500, $4504, $4501, $4505, $4508, $450C, $4509, $450D
 		dc.w    $4510, $4514, $4511, $4515, $4502, $4506, $4503, $4507
 		dc.w    $450A, $450E, $450B, $450F, $4512, $4516, $4513, $4517
@@ -28487,8 +30745,8 @@ Map16Delta_HTz:                                                ; Offset_0x02CD1E
 		dc.w    $E39A, $EB9A, $E39B, $EB9B
 ;-------------------------------------------------------------------------------
 Map16Delta_Mz:                                                 ; Offset_0x02CD9A
-		dc.w    $1730 ; Endere�o da RAM para carregar os mapeamentos ($1730+$FFFF9000) -> adda.w  (A0)+, A1
-		dc.w    $0067 ; Quantidade de Words a serem movidas para RAM    ($0000..$0067) -> move.w  (A0)+, D1
+		dc.w    $1730 ; RAM address to load the mappings ($1730+$FFFF9000) -> adda.w  (A0)+, A1
+		dc.w    $0067 ; Number of Words to be moved to RAM ($0000..$0067) -> move.w  (A0)+, D1
 		dc.w    $235C, $2B5C, $235D, $2B5D, $235E, $2B5E, $235F, $2B5F
 		dc.w    $635A, $635A, $635B, $635B, $6358, $6358, $6359, $6359
 		dc.w    $6356, $6356, $6357, $6357, $6354, $6354, $6355, $6355
@@ -28504,8 +30762,8 @@ Map16Delta_Mz:                                                 ; Offset_0x02CD9A
 		dc.w    $E34E, $E34E, $E34F, $E34F, $E34C, $E34C, $E34D, $E34D
 ;-------------------------------------------------------------------------------
 Map16Delta_HPz:                                                ; Offset_0x02CE6E
-		dc.w    $1710 ; Endereco da RAM para carregar os mapeamentos ($1710+$FFFF9000) -> adda.w  (A0)+, A1
-		dc.w    $0077 ; Quantidade de Words a serem movidas para RAM    ($0000..$0077) -> move.w  (A0)+, D1
+		dc.w    $1710 ; RAM address to load the mappings ($1710+$FFFF9000) -> adda.w  (A0)+, A1
+		dc.w    $0077 ; Number of Words to be moved to RAM ($0000..$0077) -> move.w  (A0)+, D1
 		dc.w    $62E8, $62E9, $62EA, $62EB, $62EC, $62ED, $62EE, $62EF
 		dc.w    $62F0, $62F1, $62F2, $62F3, $62F4, $62F5, $62F6, $62F7
 		dc.w    $62F8, $62F9, $62FA, $62FB, $62FC, $62FD, $62FE, $62FF
@@ -28523,8 +30781,8 @@ Map16Delta_HPz:                                                ; Offset_0x02CE6E
 		dc.w    $42F9, $42FC, $42FB, $42FE, $42FD, $0000, $42FF, $0000
 ;-------------------------------------------------------------------------------
 Map16Delta_OOz:                                                ; Offset_0x02CF62
-		dc.w    $17A0 ; Endereco da RAM para carregar os mapeamentos ($17A0+$FFFF9000) -> adda.w  (A0)+, A1
-		dc.w    $002F ; Quantidade de Words a serem movidas para RAM    ($0000..$0027) -> move.w  (A0)+, D1
+		dc.w    $17A0 ; RAM address to load the mappings ($17A0+$FFFF9000) -> adda.w  (A0)+, A1
+		dc.w    $002F ; Number of Words to be moved to RAM ($0000..$0027) -> move.w  (A0)+, D1
 		dc.w    $82B6, $82B8, $82B7, $82B9, $E2BA, $E2BB, $E2BC, $E2BD
 		dc.w    $0000, $62BE, $0000, $62C0, $62BF, $0000, $62C1, $0000
 		dc.w    $C2C2, $C2C3, $C2CA, $C2CB, $C2C4, $C2C5, $C2CC, $C2CD
@@ -28533,8 +30791,8 @@ Map16Delta_OOz:                                                ; Offset_0x02CF62
 		dc.w    $C2D6, $C2D7, $C2DE, $C2DF, $C2D8, $C2D9, $C2E0, $C2E1
 ;-------------------------------------------------------------------------------
 Map16Delta_CNz:                                                ; Offset_0x02CFC6
-		dc.w    $1760 ; Endereco da RAM para carregar os mapeamentos ($1760+$FFFF9000) -> adda.w  (A0)+, A1
-		dc.w    $004F ; Quantidade de Words a serem movidas para RAM    ($0000..$004F) -> move.w  (A0)+, D1
+		dc.w    $1760 ; RAM address to load the mappings ($1760+$FFFF9000) -> adda.w  (A0)+, A1
+		dc.w    $004F ; Number of Words to be moved to RAM ($0000..$004F) -> move.w  (A0)+, D1
 		dc.w    $0368, $036C, $0369, $036D, $0370, $0374, $0371, $0375
 		dc.w    $036A, $036E, $036B, $036F, $0372, $0376, $0373, $0377
 		dc.w    $0500, $0504, $0501, $0505, $0508, $050C, $0509, $050D
@@ -28547,13 +30805,13 @@ Map16Delta_CNz:                                                ; Offset_0x02CFC6
 		dc.w    $4532, $4536, $4533, $4537, $453A, $453E, $453B, $453F
 ;-------------------------------------------------------------------------------
 Map16Delta_CPz:                                                ; Offset_0x02D06A
-		dc.w    $17F8 ; Endereco da RAM para carregar os mapeamentos ($17F8+$FFFF9000) -> adda.w  (A0)+, A1
-		dc.w    $0003 ; Quantidade de Words a serem movidas para RAM    ($0000..$0003) -> move.w  (A0)+, D1
+		dc.w    $17F8 ; RAM address to load the mappings ($17F8+$FFFF9000) -> adda.w  (A0)+, A1
+		dc.w    $0003 ; Number of Words to be moved to RAM ($0000..$0003) -> move.w  (A0)+, D1
 		dc.w    $4370, $4371, $4370, $4371
 ;-------------------------------------------------------------------------------
 Map16Delta_NGHz:                                               ; Offset_0x02D076
-		dc.w    $17C0 ; Endereco da RAM para carregar os mapeamentos ($17C0+$FFFF9000) -> adda.w  (A0)+, A1
-		dc.w    $001F ; Quantidade de Words a serem movidas para RAM    ($0000..$001F) -> move.w  (A0)+, D1
+		dc.w    $17C0 ; RAM address to load the mappings ($17C0+$FFFF9000) -> adda.w  (A0)+, A1
+		dc.w    $001F ; Number of Words to be moved to RAM ($0000..$001F) -> move.w  (A0)+, D1
 		dc.w    $C428, $C429, $C42A, $C42B, $C42C, $C42D, $C42E, $C42F
 		dc.w    $C430, $C431, $C432, $C433, $C43C, $C43D, $C43E, $C43F
 		dc.w    $4428, $4429, $442A, $442B, $442C, $442D, $442E, $442F
@@ -28593,7 +30851,7 @@ Offset_0x02D0E0:
 		dbra    D4, Offset_0x02D0D6
 		rts
 ;===============================================================================
-; Rotina para carregar os mapeamentos para os gr�ficos din�micos das fases
+; Routine for loading the mappings to the dynamic graphics of the zones
 ; <<<-
 ;===============================================================================
 ; Offset_0x02D0F6:
@@ -28707,7 +30965,7 @@ Time_Over:    ; Not used                                      ; Offset_0x02D3F2
 		clr.b   (HUD_Timer_Refresh_Flag).w                   ; $FFFFFE1E
 		lea     (Obj_Memory_Address).w, A0                   ; $FFFFB000
 		move.l  A0, A2
-		bsr     Kill_Player                            ; Offset_0x02B57C
+		bsr     KillCharacter                          ; Offset_0x02B57C
 		move.b  #$01, ($FFFFFE1A).w
 		rts
 ;-------------------------------------------------------------------------------
@@ -30099,8 +32357,8 @@ Art_Blink:    ; Not used                                      ; Offset_0x082538
 		incbin  'art/nemesis/blink.nem'
 Art_Bubble_Monster: ; Not used                                ; Offset_0x082764
 		incbin  'art/nemesis/bmonster.nem'
-Art_Ghz_Motobug: ; Not used                                   ; Offset_0x082986
-		incbin  'art/nemesis/motobug.nem'
+Art_Ghz_Snail: ; Not used                                     ; Offset_0x082986
+		incbin  'art/nemesis/snail.nem'
 Art_CNz_Crawl: ; Not used                                     ; Offset_0x082B82
 		incbin  'art/nemesis/crawl.nem'
 Art_GHz_Masher:                                                ; Offset_0x082EE0

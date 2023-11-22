@@ -286,7 +286,7 @@ PLC_15:
                 dc.w    $BD00
 PLC_15_End:
 ;-------------------------------------------------------------------------------
-; Offset_0x02EA24: ; Bloco de carga de gráficos não usados
+; Offset_0x02EA24: ; Unused Graphics Load Block
                 dc.l    Art_HPz_Crocobot                       ; Offset_0x080694
                 dc.w    $6000
                 dc.l    Art_GHz_Buzzer                         ; Offset_0x080A36
@@ -321,7 +321,7 @@ PLC_15_End:
                 dc.w    $8000
                 dc.l    Art_Bubble_Monster                     ; Offset_0x082764
                 dc.w    $8000
-                dc.l    Art_Ghz_Motobug                        ; Offset_0x082986
+                dc.l    Art_Ghz_Snail                          ; Offset_0x082986
                 dc.w    $8000
                 dc.l    Art_CNz_Crawl                          ; Offset_0x082B82
                 dc.w    $8000
