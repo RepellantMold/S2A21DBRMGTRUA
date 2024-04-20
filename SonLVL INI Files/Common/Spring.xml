@@ -3,27 +3,27 @@
   <Images>
     <ImageFromMappings id="vertred">
       <ArtFile filename="../Art/Nemesis/V_Spring.nem" />
-      <MapFile type="ASM" filename="../Map/obj41.asm" frame="0" startpal="0" />
+      <MapFile type="ASM" filename="../sonic2alpha.asm" label="loc_EF28" startpal="0" />
     </ImageFromMappings>
     <ImageFromMappings id="vertyel">
       <ArtFile filename="../Art/Nemesis/V_Spring.nem" />
-      <MapFile type="ASM" filename="../Map/obj41.asm" frame="1" startpal="1" />
+      <MapFile type="ASM" filename="../sonic2alpha.asm" label="loc_EF28" startpal="1" />
     </ImageFromMappings>
     <ImageFromMappings id="horzred">
       <ArtFile filename="../Art/Nemesis/H_Spring.nem" />
-      <MapFile type="ASM" filename="../Map/obj41.asm" frame="3" startpal="0" />
+      <MapFile type="ASM" filename="../sonic2alpha.asm" label="loc_EF56" startpal="0" />
     </ImageFromMappings>
     <ImageFromMappings id="horzyel">
       <ArtFile filename="../Art/Nemesis/H_Spring.nem" />
-      <MapFile type="ASM" filename="../Map/obj41.asm" frame="3" startpal="1" />
+      <MapFile type="ASM" filename="../sonic2alpha.asm" label="loc_EF56" startpal="1" />
     </ImageFromMappings>
     <ImageFromMappings id="diagred">
       <ArtFile filename="../Art/Nemesis/D_Spring.nem" />
-      <MapFile type="ASM" filename="../Map/obj41.asm" frame="7" startpal="0" />
+      <MapFile type="ASM" filename="../sonic2alpha.asm" label="loc_EF96" startpal="0" />
     </ImageFromMappings>
     <ImageFromMappings id="diagyel">
       <ArtFile filename="../Art/Nemesis/D_Spring.nem" />
-      <MapFile type="ASM" filename="../Map/obj41.asm" frame="7" startpal="1" />
+      <MapFile type="ASM" filename="../sonic2alpha.asm" label="loc_F016" startpal="1" />
     </ImageFromMappings>
   </Images>
   <Subtypes>

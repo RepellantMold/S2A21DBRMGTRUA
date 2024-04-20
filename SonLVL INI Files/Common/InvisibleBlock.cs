@@ -12,7 +12,7 @@ namespace S2ObjectDefinitions.Common
 		public override void Init(ObjectData data)
 		{
 			byte[] artfile = ObjectHelper.OpenArtFile("../Art/Nemesis/Monitors.nem", CompressionType.Nemesis);			
-			img = ObjectHelper.MapASMToBmp(artfile, "../Map/obj74.asm", 0, 0);
+			img = ObjectHelper.MapASMToBmp(artfile, "../mappings/sprite/obj74.asm", 0, 0);
 		}
 
 		public override ReadOnlyCollection<byte> Subtypes

@@ -7,28 +7,80 @@ Loading 8x8 tiles from file "../Level/Emerald Hill Zone/Tiles.nem", using compre
 Loading 16x16 blocks from file "../Level/Emerald Hill Zone/Blocks.dat", using compression Uncompressed...
 Loading palette file "../Palettes/Sonic.pal"...
 Source: 0 Destination: 0 Length: 16
+Loading FG layout from file "../Level/Emerald Hill Zone/Fg_Map1.dat", using compression Uncompressed...
 Loading palette file "../Palettes/GHz.pal"...
 Source: 0 Destination: 16 Length: 48
-Loading FG layout from file "../Level/Emerald Hill Zone/Fg_Map1.dat", using compression Uncompressed...
-BG layout file "../Level/Emerald Hill Zone/Bg_Map1.dat" not found.
+Loading BG layout from file "../Level/Emerald Hill Zone/Bg_Map.dat", using compression Uncompressed...
+Loading FG layout from file "../Level/Emerald Hill Zone/Fg_Map2.dat", using compression Uncompressed...
 Loading object definition file "obj.ini".
 Loading object definition file "objGHZ.ini".
 Loading ObjectDefinition type S2ObjectDefinitions.Common.PathSwapper from "Common\PathSwapper.cs"...
 Loading type from cached assembly "dllcache\S2ObjectDefinitions.Common.PathSwapper.dll"...
-Loading ObjectDefinition type S2ObjectDefinitions.EHZ.Bridge from "GHZ\Bridge.cs"...
-Compiling code file...
+Loading ObjectDefinition type S2ObjectDefinitions.Common.InvisibleBlock from "Common\InvisibleBlock.cs"...
+Loading type from cached assembly "dllcache\S2ObjectDefinitions.Common.InvisibleBlock.dll"...
 Loading ObjectDefinition type S2ObjectDefinitions.EHZ.TwistingPathway from "GHZ\TwistingPathway.cs"...
 Loading type from cached assembly "dllcache\S2ObjectDefinitions.EHZ.TwistingPathway.dll"...
-Compile succeeded.
+Loading ObjectDefinition type S2ObjectDefinitions.EHZ.Bridge from "GHZ\Bridge.cs"...
+Loading type from cached assembly "dllcache\S2ObjectDefinitions.EHZ.Bridge.dll"...
+Loading type from cached assembly "dllcache\S2ObjectDefinitions.Common.Spikes.dll"...
 Loading objects from file "../Level/Emerald Hill Zone/Obj_Act1.dat", using compression Uncompressed...
 Loading rings from file "../Level/Emerald Hill Zone/Rng_Act1.dat", using compression Uncompressed...
 Loading start position "Level Start" from file "../Level/Emerald Hill Zone/startposact1.bin"...
-System.IO.FileNotFoundException: Could not find file 'C:\Users\sebll\Downloads\Sonic-2-Aug-21st-Disassembly\Art\Uncompressed\Pulsing ball against checkered background (GHZ).bin'.
-File name: 'C:\Users\sebll\Downloads\Sonic-2-Aug-21st-Disassembly\Art\Uncompressed\Pulsing ball against checkered background (GHZ).bin'
-   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
-   at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
-   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, FileOptions options, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
-   at System.IO.File.InternalReadAllBytes(String path, Boolean checkHost)
-   at System.IO.File.ReadAllBytes(String path)
-   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in E:\Programs\SonLVL\SonLVLAPI\LevelData.cs:line 335
+Drawing block bitmaps...
+Drawing chunk bitmaps...
+Level loaded in 1.7890241 second(s).
+Load completed.
+Loading Metropolis Zone Act 1...
+16x16 block file "../mappings/16x16/MTZ.bin" not found.
+8x8 tile file "../art/nemesis/MTZ primary.bin" not found.
+128x128 chunk file "../mappings/128x128/MTZ.bin" not found.
+FG layout file "../level/layout/MTZ_1.bin" not found.
+Loading palette file "../art/palettes/Sonic and Tails.bin"...
+Source: 0 Destination: 0 Length: 16
+BG layout file "../level/layout/MTZ_BG.bin" not found.
+FG layout file "../level/layout/MTZ_2.bin" not found.
+FG layout file "../level/layout/MTZ_3.bin" not found.
+System.AggregateException: One or more errors occurred. ---> System.IO.FileNotFoundException: Palette file could not be loaded! Have you set up your disassembly properly?
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelPalette() in E:\Programs\SonLVL\SonLVLAPI\LevelData.cs:line 689
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()
+   --- End of inner exception stack trace ---
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in E:\Programs\SonLVL\SonLVLAPI\LevelData.cs:line 179
    at SonicRetro.SonLVL.GUI.MainForm.backgroundLevelLoader_DoWork(Object sender, DoWorkEventArgs e) in E:\Programs\SonLVL\SonLVL\MainForm.cs:line 574
+---> (Inner Exception #0) System.IO.FileNotFoundException: Palette file could not be loaded! Have you set up your disassembly properly?
+File name: '../art/palettes/Sonic and Tails.bin'
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelPalette() in E:\Programs\SonLVL\SonLVLAPI\LevelData.cs:line 689
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()<---
+
+Loading Casino Night Zone Act 1...
+16x16 block file "../mappings/16x16/CNZ.bin" not found.
+8x8 tile file "../art/nemesis/CNZ primary.bin" not found.
+128x128 chunk file "../mappings/128x128/CNZ.bin" not found.
+FG layout file "../level/layout/CNZ_1.bin" not found.
+BG layout file "../level/layout/CNZ_1_BG.bin" not found.
+Loading palette file "../art/palettes/Sonic and Tails.bin"...
+Source: 0 Destination: 0 Length: 16
+FG layout file "../level/layout/CNZ_2.bin" not found.
+BG layout file "../level/layout/CNZ_2_BG.bin" not found.
+System.AggregateException: One or more errors occurred. ---> System.IO.FileNotFoundException: Palette file could not be loaded! Have you set up your disassembly properly?
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelPalette() in E:\Programs\SonLVL\SonLVLAPI\LevelData.cs:line 689
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()
+   --- End of inner exception stack trace ---
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.WaitAll(Task[] tasks, Int32 millisecondsTimeout)
+   at System.Threading.Tasks.Parallel.Invoke(ParallelOptions parallelOptions, Action[] actions)
+   at System.Threading.Tasks.Parallel.Invoke(Action[] actions)
+   at SonicRetro.SonLVL.API.LevelData.LoadLevel(String levelname, Boolean loadGraphics) in E:\Programs\SonLVL\SonLVLAPI\LevelData.cs:line 179
+   at SonicRetro.SonLVL.GUI.MainForm.backgroundLevelLoader_DoWork(Object sender, DoWorkEventArgs e) in E:\Programs\SonLVL\SonLVL\MainForm.cs:line 574
+---> (Inner Exception #0) System.IO.FileNotFoundException: Palette file could not be loaded! Have you set up your disassembly properly?
+File name: '../art/palettes/Sonic and Tails.bin'
+   at SonicRetro.SonLVL.API.LevelData.LoadLevelPalette() in E:\Programs\SonLVL\SonLVLAPI\LevelData.cs:line 689
+   at System.Threading.Tasks.Task.InnerInvoke()
+   at System.Threading.Tasks.Task.Execute()<---
+
